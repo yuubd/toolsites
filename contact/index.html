@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us | ToolKit</title>
+  <meta name="description" content="Get in touch with the ToolKit team. We'd love to hear your feedback, bug reports, or tool requests." />
+  <link rel="canonical" href="https://yourdomain.com/contact/" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo">Tool<span>Kit</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-header">
+  <div style="max-width:1100px; margin:0 auto; padding:0 1.5rem;">
+    <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:0.4rem;"><a href="/">Home</a> &rsaquo; Contact</p>
+    <h1>Contact Us</h1>
+    <p>Have a question, suggestion, or found a bug? We'd love to hear from you.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div style="max-width:600px;">
+    <div class="card">
+      <div class="prose" style="margin-bottom:1.5rem;">
+        <p>You can reach us at any time by emailing <a href="mailto:hello@yourdomain.com">hello@yourdomain.com</a>. We typically respond within 1–2 business days.</p>
+        <h2>What to include</h2>
+        <ul>
+          <li><strong>Bug reports:</strong> Which tool, what you entered, and what went wrong</li>
+          <li><strong>Tool requests:</strong> Describe the tool you'd like to see</li>
+          <li><strong>Business inquiries:</strong> Partnerships, advertising, or other collaborations</li>
+        </ul>
+      </div>
+
+      <form id="contactForm" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" placeholder="John Smith" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="john@example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <select id="subject">
+            <option value="bug">Bug Report</option>
+            <option value="request">Tool Request</option>
+            <option value="business">Business Inquiry</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" rows="5" required
+            style="width:100%;padding:0.65rem 0.9rem;border:1px solid #d1d5db;border-radius:8px;font-size:1rem;font-family:inherit;resize:vertical;"
+            placeholder="Describe your question or feedback..."></textarea>
+        </div>
+        <button type="submit" class="btn">Send Message</button>
+        <p id="formMsg" style="margin-top:1rem;color:#16a34a;display:none;font-weight:600;">Thanks! Your message has been sent.</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo">Tool<span style="color:#94a3b8">Kit</span></a>
+      <p>Free online tools that run in your browser. No account needed.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Tools</h4>
+      <a href="/mortgage/">Mortgage Calculator</a>
+    </div>
+    <div class="footer-links">
+      <h4>Company</h4>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2026 ToolKit. All rights reserved.</div>
+</footer>
+
+<script>
+  function handleSubmit(e) {
+    e.preventDefault();
+    // Static site: show confirmation. Wire up Formspree or similar for real submissions.
+    document.getElementById('contactForm').style.opacity = '0.4';
+    document.getElementById('contactForm').style.pointerEvents = 'none';
+    document.getElementById('formMsg').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
