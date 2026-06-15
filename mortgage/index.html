@@ -106,6 +106,14 @@
               <div class="val" id="totalCost">—</div>
               <div class="lbl">Total Cost</div>
             </div>
+            <div class="result-item">
+              <div class="val" id="firstPrincipal">—</div>
+              <div class="lbl">1st Mo. Principal</div>
+            </div>
+            <div class="result-item">
+              <div class="val" id="firstInterest">—</div>
+              <div class="lbl">1st Mo. Interest</div>
+            </div>
           </div>
 
           <!-- Canada-only rows -->
@@ -261,7 +269,7 @@
   }
 
   function fmt(n) {
-    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return '$' + Math.round(n).toLocaleString('en-US');
   }
 
   function fmtDec(n) {
@@ -319,10 +327,15 @@
     const totalMonthly = pi + monthlyExtras;
     const totalInterest = (pi * n) - principal;
 
+    const firstMonthInterest = principal * mRate;
+    const firstMonthPrincipal = pi - firstMonthInterest;
+
     document.getElementById('monthlyPayment').textContent = fmtDec(totalMonthly);
     document.getElementById('loanAmount').textContent = fmt(principal);
     document.getElementById('totalInterest').textContent = fmt(totalInterest);
     document.getElementById('totalCost').textContent = fmt(principal + totalInterest);
+    document.getElementById('firstPrincipal').textContent = fmtDec(firstMonthPrincipal);
+    document.getElementById('firstInterest').textContent = fmtDec(firstMonthInterest);
     document.getElementById('result').classList.add('show');
 
     // Canada extras
