@@ -30,10 +30,26 @@ header {
 .logo {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2563eb;
+  color: #1e293b;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
-.logo span { color: #1e293b; }
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border-radius: 7px;
+  padding: 3px 7px;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+}
+.logo span { color: #2563eb; }
 nav a {
   margin-left: 1.5rem;
   color: #475569;
@@ -227,6 +243,7 @@ footer {
   gap: 1.5rem;
 }
 .footer-brand .logo { color: #fff; }
+.footer-brand .logo-mark { background: #fff; color: #2563eb; }
 .footer-brand p { font-size: 0.85rem; margin-top: 0.5rem; max-width: 260px; }
 .footer-links h4 { color: #fff; font-size: 0.85rem; margin-bottom: 0.75rem; }
 .footer-links a { display: block; color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.4rem; }
