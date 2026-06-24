@@ -22,6 +22,7 @@
   }
   </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -132,6 +133,20 @@
               </div>
             </div>
             <p id="cmhcNote" style="font-size:0.78rem;color:#64748b;margin-top:0.75rem;"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="card" id="chartsCard" style="display:none;">
+        <div class="chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+          <div>
+            <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">COST BREAKDOWN</h3>
+            <canvas id="donutChart"></canvas>
+          </div>
+          <div>
+            <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">BALANCE vs EQUITY</h3>
+            <canvas id="areaChart"></canvas>
           </div>
         </div>
       </div>
@@ -375,11 +390,59 @@
     buildAmortization(principal, mRate, n, pi);
   }
 
+  let donutInst = null, areaInst = null;
+
+  function updateCharts(principal, totalInterest, yearLabels, yearBalances) {
+    const donutCtx = document.getElementById('donutChart').getContext('2d');
+    if (donutInst) donutInst.destroy();
+    donutInst = new Chart(donutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Principal', 'Total Interest'],
+        datasets: [{ data: [principal, totalInterest], backgroundColor: ['#2563eb', '#f59e0b'], borderWidth: 0 }]
+      },
+      options: {
+        cutout: '68%',
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } },
+          tooltip: { callbacks: { label: ctx => ' $' + Math.round(ctx.raw).toLocaleString('en-CA') } }
+        }
+      }
+    });
+
+    const areaCtx = document.getElementById('areaChart').getContext('2d');
+    if (areaInst) areaInst.destroy();
+    const equity = yearBalances.map(b => Math.max(0, principal - b));
+    areaInst = new Chart(areaCtx, {
+      type: 'line',
+      data: {
+        labels: yearLabels,
+        datasets: [
+          { label: 'Balance', data: yearBalances, backgroundColor: 'rgba(37,99,235,0.12)', borderColor: '#2563eb', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 },
+          { label: 'Equity', data: equity, backgroundColor: 'rgba(16,185,129,0.12)', borderColor: '#10b981', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 }
+        ]
+      },
+      options: {
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } },
+          tooltip: { callbacks: { label: ctx => ' $' + Math.round(ctx.raw).toLocaleString('en-CA') } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { maxTicksLimit: 8, font: { size: 11 } } },
+          y: { grid: { color: '#f1f5f9' }, ticks: { callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v), font: { size: 11 } } }
+        }
+      }
+    });
+
+    document.getElementById('chartsCard').style.display = 'block';
+  }
+
   function buildAmortization(principal, mRate, n, monthlyPI) {
     let balance = principal;
     const tbody = document.getElementById('amortBody');
     tbody.innerHTML = '';
 
+    const yearLabels = [], yearBalances = [];
     let yearPrincipal = 0, yearInterest = 0;
     for (let month = 1; month <= n; month++) {
       const interestPayment = balance * mRate;
@@ -390,6 +453,8 @@
 
       if (month % 12 === 0 || month === n) {
         const year = Math.ceil(month / 12);
+        yearLabels.push('Yr ' + year);
+        yearBalances.push(Math.max(0, balance));
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>Year ${year}</td>
@@ -404,6 +469,7 @@
     }
 
     document.getElementById('amortCard').style.display = 'block';
+    updateCharts(principal, (monthlyPI * n) - principal, yearLabels, yearBalances);
   }
 
   window.addEventListener('load', () => setCountry('CA'));
