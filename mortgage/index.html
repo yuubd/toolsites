@@ -63,8 +63,17 @@
             <input type="text" inputmode="numeric" id="homePrice" placeholder="e.g. 700,000" value="700,000" oninput="fmtInput(this);calculate()" />
           </div>
           <div class="form-group">
-            <label for="downPayment">Down Payment (<span class="currency-label">$</span>) <span id="dpPct" style="font-weight:400;color:#2563eb;"></span></label>
-            <input type="text" inputmode="numeric" id="downPayment" placeholder="e.g. 140,000" value="140,000" oninput="fmtInput(this);calculate()" />
+            <label>Down Payment</label>
+            <div style="display:flex;gap:0.5rem;">
+              <div style="position:relative;flex:1;">
+                <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.9rem;">$</span>
+                <input type="text" inputmode="numeric" id="downPayment" placeholder="140,000" value="140,000" oninput="fmtInput(this);syncDpPct();calculate()" style="padding-left:1.6rem;" />
+              </div>
+              <div style="position:relative;width:90px;">
+                <input type="number" id="downPaymentPct" placeholder="20" value="20" min="0" max="100" step="0.1" oninput="syncDpDollar();calculate()" style="padding-right:1.6rem;" />
+                <span style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.9rem;">%</span>
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label for="loanTerm">Amortization Period</label>
@@ -323,6 +332,19 @@
     return parseFloat(document.getElementById(id).value.replace(/,/g, '')) || 0;
   }
 
+  function syncDpPct() {
+    const price = rawNum('homePrice');
+    const dp = rawNum('downPayment');
+    if (price > 0) document.getElementById('downPaymentPct').value = ((dp / price) * 100).toFixed(1);
+  }
+
+  function syncDpDollar() {
+    const price = rawNum('homePrice');
+    const pct = parseFloat(document.getElementById('downPaymentPct').value) || 0;
+    const dollar = Math.round(price * pct / 100);
+    document.getElementById('downPayment').value = dollar.toLocaleString('en-CA');
+  }
+
   function calculate() {
     const homePrice = rawNum('homePrice');
     const downPayment = rawNum('downPayment');
@@ -334,7 +356,6 @@
     if (homePrice <= 0 || annualRate <= 0) return;
 
     const downPct = homePrice > 0 ? (downPayment / homePrice) * 100 : 0;
-    document.getElementById('dpPct').textContent = downPct > 0 ? `(${downPct.toFixed(1)}%)` : '';
 
     const isCanada = country === 'CA';
     let principal = homePrice - downPayment;
