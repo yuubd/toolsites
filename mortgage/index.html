@@ -59,11 +59,11 @@
         <form id="mortgageForm" onsubmit="return false;">
           <div class="form-group">
             <label for="homePrice">Home Price (<span class="currency-label">$</span>)</label>
-            <input type="number" id="homePrice" placeholder="e.g. 700000" min="0" value="700000" oninput="calculate()" />
+            <input type="text" inputmode="numeric" id="homePrice" placeholder="e.g. 700,000" value="700,000" oninput="fmtInput(this);calculate()" />
           </div>
           <div class="form-group">
             <label for="downPayment">Down Payment (<span class="currency-label">$</span>) <span id="dpPct" style="font-weight:400;color:#2563eb;"></span></label>
-            <input type="number" id="downPayment" placeholder="e.g. 140000" min="0" value="140000" oninput="calculate()" />
+            <input type="text" inputmode="numeric" id="downPayment" placeholder="e.g. 140,000" value="140,000" oninput="fmtInput(this);calculate()" />
           </div>
           <div class="form-group">
             <label for="loanTerm">Amortization Period</label>
@@ -81,11 +81,11 @@
           </div>
           <div class="form-group">
             <label for="propertyTax">Annual Property Tax (<span class="currency-label">$</span>) <span style="font-weight:400;color:#94a3b8;">(optional)</span></label>
-            <input type="number" id="propertyTax" placeholder="e.g. 4800" min="0" value="0" oninput="calculate()" />
+            <input type="text" inputmode="numeric" id="propertyTax" placeholder="e.g. 4,800" value="" oninput="fmtInput(this);calculate()" />
           </div>
           <div class="form-group">
             <label for="homeInsurance">Annual Home Insurance (<span class="currency-label">$</span>) <span style="font-weight:400;color:#94a3b8;">(optional)</span></label>
-            <input type="number" id="homeInsurance" placeholder="e.g. 1200" min="0" value="0" oninput="calculate()" />
+            <input type="text" inputmode="numeric" id="homeInsurance" placeholder="e.g. 1,200" value="" oninput="fmtInput(this);calculate()" />
           </div>
         </form>
 
@@ -294,13 +294,31 @@
     return principal * (mRate * Math.pow(1 + mRate, n)) / (Math.pow(1 + mRate, n) - 1);
   }
 
+  function fmtInput(el) {
+    const pos = el.selectionStart;
+    const raw = el.value.replace(/[^0-9]/g, '');
+    const before = el.value.slice(0, pos).replace(/[^0-9]/g, '').length;
+    if (raw === '') { el.value = ''; return; }
+    const formatted = parseInt(raw, 10).toLocaleString('en-CA');
+    el.value = formatted;
+    // restore cursor position accounting for added commas
+    let count = 0, newPos = 0;
+    for (let i = 0; i < formatted.length && count < before; i++, newPos = i)
+      if (formatted[i] !== ',') count++;
+    el.setSelectionRange(newPos, newPos);
+  }
+
+  function rawNum(id) {
+    return parseFloat(document.getElementById(id).value.replace(/,/g, '')) || 0;
+  }
+
   function calculate() {
-    const homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
-    const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+    const homePrice = rawNum('homePrice');
+    const downPayment = rawNum('downPayment');
     const loanTermYears = parseInt(document.getElementById('loanTerm').value);
     const annualRate = parseFloat(document.getElementById('interestRate').value) || 0;
-    const propertyTax = parseFloat(document.getElementById('propertyTax').value) || 0;
-    const homeInsurance = parseFloat(document.getElementById('homeInsurance').value) || 0;
+    const propertyTax = rawNum('propertyTax');
+    const homeInsurance = rawNum('homeInsurance');
 
     if (homePrice <= 0 || annualRate <= 0) return;
 
