@@ -47,6 +47,30 @@
   <!-- Top ad banner -->
   <div class="ad-slot ad-slot-banner"></div>
 
+  <!-- City presets dashboard -->
+  <div class="card" style="margin-bottom:1.5rem;" id="cityPresets">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+      <h3 style="font-size:1rem;font-weight:700;margin:0;">Quick start by city</h3>
+      <span style="font-size:0.78rem;color:#94a3b8;">Avg. prices · CREA est. 2025</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.6rem;" id="caPresets">
+      <button class="city-btn" onclick="setCity(1200000,0.2,'CA')">🏙️ Vancouver<br><span>$1,200,000</span></button>
+      <button class="city-btn" onclick="setCity(1050000,0.2,'CA')">🏙️ Toronto<br><span>$1,050,000</span></button>
+      <button class="city-btn" onclick="setCity(650000,0.2,'CA')">🏛️ Ottawa<br><span>$650,000</span></button>
+      <button class="city-btn" onclick="setCity(590000,0.2,'CA')">🤠 Calgary<br><span>$590,000</span></button>
+      <button class="city-btn" onclick="setCity(550000,0.2,'CA')">🥐 Montréal<br><span>$550,000</span></button>
+      <button class="city-btn" onclick="setCity(430000,0.2,'CA')">🛢️ Edmonton<br><span>$430,000</span></button>
+    </div>
+    <div style="display:none;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.6rem;" id="usPresets">
+      <button class="city-btn" onclick="setCity(950000,0.2,'US')">🌴 Los Angeles<br><span>$950,000</span></button>
+      <button class="city-btn" onclick="setCity(1300000,0.2,'US')">🌉 San Francisco<br><span>$1,300,000</span></button>
+      <button class="city-btn" onclick="setCity(750000,0.2,'US')">🗽 New York<br><span>$750,000</span></button>
+      <button class="city-btn" onclick="setCity(420000,0.2,'US')">🤠 Dallas<br><span>$420,000</span></button>
+      <button class="city-btn" onclick="setCity(520000,0.2,'US')">☀️ Miami<br><span>$520,000</span></button>
+      <button class="city-btn" onclick="setCity(580000,0.2,'US')">🌲 Seattle<br><span>$580,000</span></button>
+    </div>
+  </div>
+
   <div class="layout">
     <!-- Main tool -->
     <div>
@@ -149,13 +173,13 @@
       <!-- Charts -->
       <div class="card" id="chartsCard" style="display:none;">
         <div class="chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
-          <div style="max-width:280px;margin:0 auto;width:100%;">
+          <div style="width:100%;">
             <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">COST BREAKDOWN</h3>
-            <canvas id="donutChart"></canvas>
+            <div style="position:relative;height:280px;"><canvas id="donutChart"></canvas></div>
           </div>
           <div style="width:100%;">
             <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">PRINCIPAL vs INTEREST</h3>
-            <canvas id="barChart" style="width:100% !important;"></canvas>
+            <div style="position:relative;height:280px;"><canvas id="barChart"></canvas></div>
           </div>
         </div>
       </div>
@@ -282,6 +306,8 @@
     document.getElementById('btnUS').style.color = c === 'US' ? '#fff' : '#1e293b';
     document.getElementById('factsCA').style.display = c === 'CA' ? 'block' : 'none';
     document.getElementById('factsUS').style.display = c === 'US' ? 'block' : 'none';
+    document.getElementById('caPresets').style.display = c === 'CA' ? 'grid' : 'none';
+    document.getElementById('usPresets').style.display = c === 'US' ? 'grid' : 'none';
     // Default amortization period
     document.getElementById('loanTerm').value = c === 'CA' ? '25' : '30';
     calculate();
@@ -330,6 +356,16 @@
 
   function rawNum(id) {
     return parseFloat(document.getElementById(id).value.replace(/,/g, '')) || 0;
+  }
+
+  function setCity(price, dpRatio, c) {
+    if (c !== country) setCountry(c);
+    document.getElementById('homePrice').value = price.toLocaleString('en-CA');
+    const dp = Math.round(price * dpRatio);
+    document.getElementById('downPayment').value = dp.toLocaleString('en-CA');
+    document.getElementById('downPaymentPct').value = (dpRatio * 100).toFixed(1);
+    calculate();
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
   }
 
   function syncDpPct() {
@@ -419,6 +455,7 @@
         datasets: [{ data: [principal, totalInterest], backgroundColor: ['#4ade80', '#fbbf24'], borderWidth: 0 }]
       },
       options: {
+        maintainAspectRatio: false,
         cutout: '68%',
         plugins: {
           legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } },
@@ -439,7 +476,7 @@
         ]
       },
       options: {
-        aspectRatio: 1.6,
+        maintainAspectRatio: false,
         plugins: {
           legend: { position: 'top', labels: { font: { size: 12 }, padding: 12, boxWidth: 12 } },
           tooltip: { callbacks: { label: ctx => ' $' + Math.round(ctx.raw).toLocaleString('en-CA') } }
