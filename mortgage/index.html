@@ -149,13 +149,13 @@
       <!-- Charts -->
       <div class="card" id="chartsCard" style="display:none;">
         <div class="chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
-          <div>
+          <div style="max-width:280px;margin:0 auto;width:100%;">
             <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">COST BREAKDOWN</h3>
             <canvas id="donutChart"></canvas>
           </div>
-          <div>
+          <div style="width:100%;">
             <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">PRINCIPAL vs INTEREST</h3>
-            <canvas id="barChart"></canvas>
+            <canvas id="barChart" style="width:100% !important;"></canvas>
           </div>
         </div>
       </div>
@@ -439,6 +439,7 @@
         ]
       },
       options: {
+        aspectRatio: 1.6,
         plugins: {
           legend: { position: 'top', labels: { font: { size: 12 }, padding: 12, boxWidth: 12 } },
           tooltip: { callbacks: { label: ctx => ' $' + Math.round(ctx.raw).toLocaleString('en-CA') } }
