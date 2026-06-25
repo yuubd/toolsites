@@ -3,14 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>G9 Toolkit — Free Online Tools for Everyone</title>
-  <meta name="description" content="Free, fast, and easy-to-use online tools. No login required. Calculate mortgages, convert files, check word counts, and more — all in your browser." />
-  <meta property="og:title" content="G9 Toolkit — Free Online Tools for Everyone" />
-  <meta property="og:description" content="Free, fast, and easy-to-use online tools. No login required." />
+  <title>G9 Toolkit — Free Online Calculators and Tools</title>
+  <meta name="description" content="Free online calculators and tools that run entirely in your browser. No login, no signup. Mortgage calculator, loan calculator, and more." />
+  <meta property="og:title" content="G9 Toolkit — Free Online Calculators and Tools" />
+  <meta property="og:description" content="Free, fast, browser-based tools. No login required." />
   <meta property="og:type" content="website" />
   <link rel="canonical" href="https://g9toolkit.com/" />
   <link rel="stylesheet" href="/css/style.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "G9 Toolkit",
+    "url": "https://g9toolkit.com",
+    "description": "Free online calculators and tools for finance, math, and everyday use."
+  }
+  </script>
 </head>
 <body>
 
@@ -26,40 +35,53 @@
 
 <section class="hero">
   <h1>Free Online Tools for Everyone</h1>
-  <p>Fast, simple, and free tools that run entirely in your browser. No login. No signup. No hassle.</p>
+  <p>Fast, accurate, browser-based calculators. No login. No signup. No hassle.</p>
 </section>
 
 <div class="container">
 
-  <!-- Top ad banner -->
   <div class="ad-slot ad-slot-banner"></div>
 
-  <h2 style="font-size:1.1rem; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase;">Finance Tools</h2>
+  <h2 style="font-size:1.1rem;font-weight:700;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:1rem;">Finance Tools</h2>
   <div class="tool-grid">
     <a href="/mortgage/" class="tool-card">
       <div class="icon">🏠</div>
       <span class="badge">Finance</span>
       <h3>Mortgage Calculator</h3>
-      <p>Calculate your monthly mortgage payment, total interest, and view a full amortization schedule.</p>
+      <p>Calculate your monthly mortgage payment, total interest, and view a full amortization schedule. Supports Canada (CMHC, stress test) and the United States.</p>
     </a>
-    <!-- More tools coming soon -->
-    <div class="tool-card" style="opacity:0.45; pointer-events:none;">
-      <div class="icon">💰</div>
-      <span class="badge">Finance</span>
-      <h3>Loan Calculator</h3>
-      <p>Calculate monthly payments for personal or auto loans.</p>
-    </div>
-    <div class="tool-card" style="opacity:0.45; pointer-events:none;">
-      <div class="icon">📈</div>
-      <span class="badge">Finance</span>
-      <h3>Compound Interest Calculator</h3>
-      <p>See how your savings grow over time with compound interest.</p>
+  </div>
+
+  <div style="max-width:720px;margin-top:3rem;">
+    <div class="card prose">
+      <h2>What Is G9 Toolkit?</h2>
+      <p>G9 Toolkit is a collection of free, accurate online calculators and tools built to help you make better financial and everyday decisions. Every tool runs entirely in your browser — no account required, no data sent to any server.</p>
+
+      <h2>Mortgage Calculator — Canada &amp; US</h2>
+      <p>Our mortgage calculator is built specifically for Canadian and American homebuyers. For Canada, it uses the legally required semi-annual compounding formula under the Interest Act, calculates CMHC mortgage insurance premiums for down payments under 20%, and shows your stress test qualifying payment. For the US, it uses standard monthly compounding.</p>
+      <p>Enter your home price, down payment, amortization period, and interest rate to instantly see your monthly payment, total interest paid, and a full year-by-year amortization schedule.</p>
+
+      <h2>Why Use G9 Toolkit?</h2>
+      <ul>
+        <li><strong>100% free</strong> — no subscription, no hidden fees</li>
+        <li><strong>No login required</strong> — open any tool and start calculating immediately</li>
+        <li><strong>Accurate formulas</strong> — Canadian mortgages use the correct semi-annual compounding method required by Canadian law</li>
+        <li><strong>Privacy first</strong> — all calculations happen in your browser; nothing is stored or sent anywhere</li>
+        <li><strong>Mobile friendly</strong> — works on any device, any screen size</li>
+      </ul>
+
+      <h2>Canadian Mortgage Basics</h2>
+      <p>In Canada, mortgage interest is compounded semi-annually by law (twice per year), not monthly like in the US. This means the effective monthly rate is lower than simply dividing the annual rate by 12. The correct formula is:</p>
+      <p><strong>Monthly rate = (1 + annual rate / 2)^(1/6) − 1</strong></p>
+      <p>If your down payment is less than 20% of the purchase price, you are required to purchase CMHC mortgage default insurance. The premium ranges from 2.80% to 4.00% of the loan amount depending on your down payment percentage, and is added to your mortgage principal.</p>
+      <p>Canadian lenders also apply a mortgage stress test: you must qualify at the higher of your contract rate plus 2%, or the minimum qualifying rate of 5.25%. Our calculator shows both your actual payment and your stress test payment.</p>
+
+      <h2>US Mortgage Basics</h2>
+      <p>In the United States, mortgage interest is compounded monthly. The monthly rate is simply the annual rate divided by 12. Standard US mortgages are typically 15 or 30 years. Private Mortgage Insurance (PMI) is required if your down payment is less than 20%.</p>
     </div>
   </div>
 
-  <!-- Bottom ad banner -->
-  <div class="ad-slot ad-slot-bottom" style="margin-top:2rem;"></div>
-
+  <div class="ad-slot ad-slot-bottom"></div>
 </div>
 
 <footer>
@@ -83,9 +105,7 @@
       <a href="/terms/">Terms of Service</a>
     </div>
   </div>
-  <div class="footer-bottom">
-    &copy; 2026 G9 Toolkit. All rights reserved.
-  </div>
+  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved.</div>
 </footer>
 
 </body>
