@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phrasal Verb Flashcards — Learn 120+ Phrasal Verbs | G9 Toolkit</title>
+  <meta name="description" content="Learn phrasal verbs with flashcards, examples, and a quiz mode. 120+ phrasal verbs organized by base verb. Filter by verb, search, and track what you know." />
+  <meta property="og:title" content="Phrasal Verb Flashcards | G9 Toolkit" />
+  <meta property="og:description" content="Master 120+ English phrasal verbs with examples and flashcard practice. Free, no signup." />
+  <link rel="canonical" href="https://g9toolkit.com/phrasal-verbs/" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <style>
+    body { background: #f1f5f9; }
+    .pv-wrap { max-width: 820px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+    /* Mode tabs */
+    .mode-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .mode-tab {
+      flex: 1; padding: 0.6rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
+      background: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      color: #64748b; transition: all 0.15s; text-align: center;
+    }
+    .mode-tab.active { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+
+    /* Filter bar */
+    .filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+    .filter-bar input {
+      flex: 1; min-width: 180px; padding: 0.55rem 0.9rem; border: 1px solid #d1d5db;
+      border-radius: 8px; font-size: 0.9rem; color: #1e293b;
+    }
+    .filter-bar input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .verb-filter { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .vf-btn {
+      padding: 0.3rem 0.75rem; border: 1.5px solid #e2e8f0; border-radius: 999px;
+      background: #fff; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      color: #475569; transition: all 0.15s;
+    }
+    .vf-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .vf-btn.active { border-color: #2563eb; background: #2563eb; color: #fff; }
+
+    /* List view */
+    .pv-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .pv-item {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 1rem;
+      transition: box-shadow 0.15s;
+    }
+    .pv-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .pv-verb { font-weight: 800; font-size: 1rem; color: #2563eb; min-width: 140px; }
+    .pv-body { flex: 1; }
+    .pv-def { font-size: 0.9rem; color: #1e293b; margin-bottom: 0.25rem; font-weight: 500; }
+    .pv-ex  { font-size: 0.82rem; color: #64748b; font-style: italic; }
+    .pv-tag {
+      font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px;
+      background: #f1f5f9; color: #64748b; white-space: nowrap; margin-top: 0.2rem;
+      display: inline-block;
+    }
+    .know-toggle {
+      background: none; border: none; cursor: pointer; font-size: 1.3rem; flex-shrink: 0;
+      opacity: 0.35; transition: opacity 0.15s;
+    }
+    .know-toggle.known { opacity: 1; }
+
+    /* Flashcard mode */
+    .card-scene { perspective: 1200px; height: 280px; margin-bottom: 1.25rem; cursor: pointer; }
+    .card-inner {
+      width: 100%; height: 100%; position: relative;
+      transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+    .card-inner.flipped { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute; inset: 0; backface-visibility: hidden;
+      border-radius: 16px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 2rem;
+      text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .card-front { background: #fff; border: 2px solid #e2e8f0; }
+    .card-back  { background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #fff; transform: rotateY(180deg); }
+    .card-hint  { font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+    .card-back .card-hint { color: rgba(255,255,255,0.6); }
+    .card-pv   { font-size: 2.2rem; font-weight: 800; color: #7c3aed; }
+    .card-def  { font-size: 1rem; font-weight: 700; margin-bottom: 0.6rem; line-height: 1.45; }
+    .card-ex   { font-size: 0.85rem; opacity: 0.85; font-style: italic; line-height: 1.55; }
+    .card-num  { font-size: 0.78rem; color: #94a3b8; margin-top: 0.75rem; }
+
+    .controls { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .ctrl-btn {
+      padding: 0.55rem 1.1rem; border-radius: 8px; border: 1.5px solid #e2e8f0;
+      background: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      color: #475569; transition: all 0.15s;
+    }
+    .ctrl-btn:hover { background: #f1f5f9; }
+    .ctrl-btn.know { border-color: #22c55e; color: #16a34a; }
+    .ctrl-btn.know:hover { background: #f0fdf4; }
+    .ctrl-btn.skip { border-color: #ef4444; color: #dc2626; }
+    .ctrl-btn.skip:hover { background: #fef2f2; }
+    .ctrl-btn.primary { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+    .ctrl-btn.primary:hover { background: #6d28d9; }
+
+    .progress-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .prog-bar-wrap { flex: 1; background: #e2e8f0; border-radius: 999px; height: 8px; }
+    .prog-bar { background: #7c3aed; height: 8px; border-radius: 999px; transition: width 0.3s; }
+    .prog-label { font-size: 0.8rem; color: #64748b; white-space: nowrap; }
+
+    .count-bar { font-size: 0.8rem; color: #64748b; margin-bottom: 1rem; }
+    .count-bar span { font-weight: 700; color: #1e293b; }
+
+    /* Quiz mode */
+    .quiz-q { font-size: 1.6rem; font-weight: 800; color: #7c3aed; text-align: center; margin: 1rem 0; }
+    .quiz-hint { font-size: 0.85rem; color: #64748b; font-style: italic; text-align: center; margin-bottom: 1.5rem; }
+    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1rem; }
+    .quiz-opt {
+      padding: 0.75rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
+      background: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      text-align: left; transition: all 0.15s; color: #1e293b;
+    }
+    .quiz-opt:hover:not(:disabled) { border-color: #7c3aed; background: #f5f3ff; }
+    .quiz-opt.correct { border-color: #22c55e !important; background: #f0fdf4 !important; color: #16a34a !important; }
+    .quiz-opt.wrong   { border-color: #ef4444 !important; background: #fef2f2 !important; color: #dc2626 !important; }
+    .quiz-feedback { text-align: center; font-size: 0.88rem; color: #64748b; margin-bottom: 0.5rem; min-height: 1.4rem; }
+    .quiz-score { display: flex; gap: 1rem; justify-content: center; font-size: 0.85rem; color: #64748b; margin-top: 0.5rem; }
+    .quiz-score .s-correct { font-weight: 700; color: #16a34a; }
+    .quiz-score .s-wrong   { font-weight: 700; color: #dc2626; }
+
+    @media (max-width: 500px) {
+      .pv-item { flex-direction: column; }
+      .quiz-options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+    <nav>
+      <a href="/flashcards/">Flashcards</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<div class="pv-wrap">
+  <h1 class="tool-title" style="text-align:center;">Phrasal Verb Flashcards</h1>
+  <p class="tool-subtitle" style="text-align:center;margin-bottom:1.5rem;">120+ phrasal verbs with examples — flashcard, list, and quiz modes</p>
+
+  <div class="ad-slot ad-slot-banner" style="margin-bottom:1.25rem;"></div>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tab-list"  onclick="setMode('list')">📋 List</button>
+    <button class="mode-tab"        id="tab-cards" onclick="setMode('cards')">🃏 Flashcards</button>
+    <button class="mode-tab"        id="tab-quiz"  onclick="setMode('quiz')">🎯 Quiz</button>
+  </div>
+
+  <!-- LIST MODE -->
+  <div id="pane-list">
+    <div class="filter-bar">
+      <input type="text" id="list-search" placeholder="Search phrasal verbs…" oninput="renderList()" />
+    </div>
+    <div class="verb-filter" id="verb-filter"></div>
+    <div class="count-bar" id="list-count"></div>
+    <div class="pv-list" id="pv-list"></div>
+  </div>
+
+  <!-- FLASHCARD MODE -->
+  <div id="pane-cards" style="display:none">
+    <div class="filter-bar" style="margin-bottom:0.75rem;">
+      <select id="fc-filter" onchange="initCards()" style="padding:0.55rem 0.9rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.9rem;background:#fff;color:#1e293b">
+        <option value="all">All phrasal verbs</option>
+      </select>
+      <button class="ctrl-btn" onclick="initCards()">🔀 Shuffle</button>
+    </div>
+    <div class="progress-row">
+      <div class="prog-bar-wrap"><div class="prog-bar" id="fc-prog" style="width:0%"></div></div>
+      <div class="prog-label" id="fc-prog-label">0 / 0</div>
+    </div>
+    <div class="card-scene" onclick="fcFlip()">
+      <div class="card-inner" id="fc-inner">
+        <div class="card-face card-front">
+          <div class="card-hint">Tap to see definition</div>
+          <div class="card-pv" id="fc-pv">—</div>
+          <div class="card-num" id="fc-num"></div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-hint">Definition & example</div>
+          <div class="card-def" id="fc-def"></div>
+          <div class="card-ex"  id="fc-ex"></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:0.78rem;color:#94a3b8;margin-bottom:0.75rem;">Tap card to flip · Space / ←→ keyboard shortcuts</div>
+    <div class="controls">
+      <button class="ctrl-btn skip" onclick="fcMark(false)">✗ Don't know</button>
+      <button class="ctrl-btn"      onclick="fcFlip()">↩ Flip</button>
+      <button class="ctrl-btn know" onclick="fcMark(true)">✓ Got it</button>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="fcPrev()">← Prev</button>
+      <button class="ctrl-btn primary" onclick="fcStudyMissed()">📌 Study missed</button>
+    </div>
+    <div id="fc-done" style="display:none;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:2rem;text-align:center;margin-top:1rem;">
+      <div style="font-size:2rem">🎉</div>
+      <div style="font-size:1.4rem;font-weight:800;margin:0.5rem 0;">Deck complete!</div>
+      <div id="fc-score-label" style="color:#64748b;margin-bottom:1rem;"></div>
+      <div class="controls" style="justify-content:center;">
+        <button class="ctrl-btn primary" onclick="initCards()">↻ Restart</button>
+        <button class="ctrl-btn" onclick="fcStudyMissedFinal()">📌 Study missed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ MODE -->
+  <div id="pane-quiz" style="display:none">
+    <div class="filter-bar" style="margin-bottom:1rem;">
+      <select id="quiz-filter" onchange="initQuiz()" style="padding:0.55rem 0.9rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.9rem;background:#fff;color:#1e293b">
+        <option value="all">All phrasal verbs</option>
+      </select>
+    </div>
+    <div class="progress-row">
+      <div class="prog-bar-wrap"><div class="prog-bar" id="quiz-prog" style="width:0%"></div></div>
+      <div class="prog-label" id="quiz-prog-label">0 / 0</div>
+    </div>
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.5rem 1.5rem 1rem;">
+      <div class="card-hint" style="text-align:center;font-size:0.72rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">What does this phrasal verb mean?</div>
+      <div class="quiz-q" id="quiz-q">—</div>
+      <div class="quiz-hint" id="quiz-hint"></div>
+      <div class="quiz-options" id="quiz-opts"></div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <div class="quiz-score">
+        <span>Correct: <span class="s-correct" id="q-correct">0</span></span>
+        <span>Wrong: <span class="s-wrong" id="q-wrong">0</span></span>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:1rem;">
+      <button class="ctrl-btn primary" onclick="initQuiz()">↻ New quiz</button>
+    </div>
+  </div>
+
+  <div class="card prose" style="margin-top:2rem;">
+    <h2>What are phrasal verbs?</h2>
+    <p>A phrasal verb is a verb combined with one or two particles (a preposition, an adverb, or both) that together create a meaning different from the original verb. For example, "give up" means to quit, which is very different from the verb "give." Phrasal verbs are extremely common in spoken and informal written English.</p>
+
+    <h2>Separable vs inseparable phrasal verbs</h2>
+    <p><strong>Separable</strong> phrasal verbs allow a noun object between the verb and the particle: "turn the music down" or "turn down the music." With pronouns, the object must go in the middle: "turn it down" (not "turn down it"). <strong>Inseparable</strong> phrasal verbs must keep the verb and particle together: "look after the children" (not "look the children after").</p>
+
+    <h2>Tips for learning phrasal verbs</h2>
+    <p>Learn phrasal verbs in context, not just as word pairs. Read the example sentence aloud several times. Group them by base verb (all the "get" ones together) to spot patterns. Use them in your own sentences immediately — the more you use them actively, the faster they stick. Our quiz mode reinforces recognition; the flashcard mode reinforces recall.</p>
+  </div>
+
+  <div class="ad-slot ad-slot-bottom" style="margin-top:1.5rem;"></div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+      <p>Free online tools that run in your browser. No account needed.</p>
+    </div>
+    <div class="footer-links">
+      <h4>English Tools</h4>
+      <a href="/flashcards/">English Flashcards</a>
+      <a href="/phrasal-verbs/">Phrasal Verbs</a>
+    </div>
+    <div class="footer-links">
+      <h4>Other Tools</h4>
+      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/bmi/">BMI Calculator</a>
+      <a href="/world-clock/">World Clock</a>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved.</div>
+</footer>
+
+<script>
+const PVS = [
+  // BREAK
+  { verb:'break', pv:'break down', def:'To stop working (machine/vehicle); to lose emotional control; to analyze in detail', ex:'"My car broke down on the highway."', cat:'break' },
+  { verb:'break', pv:'break in', def:'To enter by force; to interrupt a conversation; to train something new', ex:'"Someone broke in and stole the laptop."', cat:'break' },
+  { verb:'break', pv:'break into', def:'To enter a building illegally; to suddenly start doing something', ex:'"She broke into a smile when she saw him."', cat:'break' },
+  { verb:'break', pv:'break off', def:'To end a relationship or agreement suddenly', ex:'"They broke off their engagement last month."', cat:'break' },
+  { verb:'break', pv:'break out', def:'To escape from prison; to suddenly start (war, fire, disease)', ex:'"A fire broke out in the kitchen."', cat:'break' },
+  { verb:'break', pv:'break through', def:'To make a discovery; to force past a barrier', ex:'"Scientists broke through with a new treatment."', cat:'break' },
+  { verb:'break', pv:'break up', def:'To end a romantic relationship; to separate into pieces', ex:'"They broke up after three years together."', cat:'break' },
+  // BRING
+  { verb:'bring', pv:'bring about', def:'To cause something to happen', ex:'"The new policy brought about major changes."', cat:'bring' },
+  { verb:'bring', pv:'bring back', def:'To return something; to make someone remember', ex:'"That song brings back so many memories."', cat:'bring' },
+  { verb:'bring', pv:'bring forward', def:'To move a meeting or event to an earlier time', ex:'"Can we bring the meeting forward to Monday?"', cat:'bring' },
+  { verb:'bring', pv:'bring up', def:'To raise a child; to mention a topic in conversation', ex:'"Don\'t bring up money at the dinner table."', cat:'bring' },
+  // CALL
+  { verb:'call', pv:'call back', def:'To return a phone call', ex:'"I missed your call — I\'ll call you back."', cat:'call' },
+  { verb:'call', pv:'call off', def:'To cancel something that was planned', ex:'"The game was called off due to rain."', cat:'call' },
+  { verb:'call', pv:'call on', def:'To visit someone; to ask someone to speak or answer', ex:'"The teacher called on me to answer."', cat:'call' },
+  { verb:'call', pv:'call out', def:'To shout; to publicly criticize someone\'s behavior', ex:'"She called him out for taking credit for her work."', cat:'call' },
+  // CARRY
+  { verb:'carry', pv:'carry on', def:'To continue doing something', ex:'"Carry on — don\'t let me interrupt you."', cat:'carry' },
+  { verb:'carry', pv:'carry out', def:'To do or complete a task or plan', ex:'"The team carried out the experiment successfully."', cat:'carry' },
+  { verb:'carry', pv:'carry over', def:'To transfer something to the next period', ex:'"Unused vacation days carry over to next year."', cat:'carry' },
+  // COME
+  { verb:'come', pv:'come across', def:'To find or meet unexpectedly; to give a certain impression', ex:'"She comes across as very confident."', cat:'come' },
+  { verb:'come', pv:'come back', def:'To return to a place or topic', ex:'"Can we come back to this point later?"', cat:'come' },
+  { verb:'come', pv:'come down with', def:'To become ill with something', ex:'"I think I\'m coming down with a cold."', cat:'come' },
+  { verb:'come', pv:'come forward', def:'To volunteer information; to offer to help', ex:'"A witness came forward with new evidence."', cat:'come' },
+  { verb:'come', pv:'come up', def:'To be mentioned; to arise unexpectedly', ex:'"Something unexpected came up at work."', cat:'come' },
+  { verb:'come', pv:'come up with', def:'To think of an idea or solution', ex:'"She came up with a brilliant plan."', cat:'come' },
+  // CUT
+  { verb:'cut', pv:'cut back', def:'To reduce the amount of something', ex:'"We need to cut back on spending."', cat:'cut' },
+  { verb:'cut', pv:'cut down', def:'To reduce; to fell a tree', ex:'"Try to cut down on sugar."', cat:'cut' },
+  { verb:'cut', pv:'cut in', def:'To interrupt a conversation; to move in front of someone in traffic', ex:'"She cut in while I was talking."', cat:'cut' },
+  { verb:'cut', pv:'cut off', def:'To stop suddenly; to separate; to interrupt', ex:'"My phone was cut off mid-call."', cat:'cut' },
+  { verb:'cut', pv:'cut out', def:'To stop doing something; to remove a piece', ex:'"Cut it out — you\'re being annoying."', cat:'cut' },
+  // FALL
+  { verb:'fall', pv:'fall apart', def:'To break into pieces; to fail completely', ex:'"Their marriage fell apart after two years."', cat:'fall' },
+  { verb:'fall', pv:'fall back on', def:'To use something as a backup when other things fail', ex:'"I can always fall back on my teaching degree."', cat:'fall' },
+  { verb:'fall', pv:'fall behind', def:'To fail to keep up with a schedule or others', ex:'"He fell behind on his rent payments."', cat:'fall' },
+  { verb:'fall', pv:'fall for', def:'To be deceived by; to develop romantic feelings for', ex:'"I completely fell for that joke."', cat:'fall' },
+  { verb:'fall', pv:'fall out', def:'To have an argument and stop being friends', ex:'"They fell out over a misunderstanding."', cat:'fall' },
+  { verb:'fall', pv:'fall through', def:'To fail to happen; to not be completed', ex:'"The deal fell through at the last minute."', cat:'fall' },
+  // GET
+  { verb:'get', pv:'get along', def:'To have a friendly relationship with someone', ex:'"Do you get along with your coworkers?"', cat:'get' },
+  { verb:'get', pv:'get away', def:'To escape; to go on vacation', ex:'"We need to get away for a few days."', cat:'get' },
+  { verb:'get', pv:'get away with', def:'To do something wrong without being caught or punished', ex:'"He got away with cheating on the test."', cat:'get' },
+  { verb:'get', pv:'get back', def:'To return; to receive something you lost', ex:'"When will you get back from your trip?"', cat:'get' },
+  { verb:'get', pv:'get by', def:'To manage to survive with limited resources', ex:'"We\'re getting by on one salary."', cat:'get' },
+  { verb:'get', pv:'get in', def:'To enter a vehicle or building; to be accepted', ex:'"She got into Harvard!"', cat:'get' },
+  { verb:'get', pv:'get on', def:'To board a vehicle; to make progress; to have a good relationship', ex:'"We really get on well together."', cat:'get' },
+  { verb:'get', pv:'get out of', def:'To avoid a duty; to leave a vehicle', ex:'"I\'m trying to get out of the meeting tomorrow."', cat:'get' },
+  { verb:'get', pv:'get over', def:'To recover from an illness or disappointment', ex:'"It took months to get over the breakup."', cat:'get' },
+  { verb:'get', pv:'get rid of', def:'To remove or throw away something unwanted', ex:'"I need to get rid of all these old clothes."', cat:'get' },
+  { verb:'get', pv:'get together', def:'To meet socially; to start a romantic relationship', ex:'"Let\'s get together this weekend."', cat:'get' },
+  { verb:'get', pv:'get up', def:'To rise from bed; to stand up', ex:'"I get up at 6am every day."', cat:'get' },
+  // GIVE
+  { verb:'give', pv:'give away', def:'To give something for free; to reveal a secret accidentally', ex:'"His nervous laugh gave away the surprise."', cat:'give' },
+  { verb:'give', pv:'give back', def:'To return something to its owner', ex:'"Give back the book when you\'re done."', cat:'give' },
+  { verb:'give', pv:'give in', def:'To stop resisting; to surrender', ex:'"I finally gave in and bought the expensive shoes."', cat:'give' },
+  { verb:'give', pv:'give up', def:'To stop trying; to quit', ex:'"Don\'t give up — you\'re almost there."', cat:'give' },
+  // GO
+  { verb:'go', pv:'go ahead', def:'To proceed; to do something you were waiting for permission to do', ex:'"Go ahead — we\'re listening."', cat:'go' },
+  { verb:'go', pv:'go along with', def:'To agree with or accept someone\'s idea', ex:'"I\'ll go along with your plan this time."', cat:'go' },
+  { verb:'go', pv:'go back on', def:'To fail to keep a promise or agreement', ex:'"Don\'t go back on your word."', cat:'go' },
+  { verb:'go', pv:'go off', def:'To explode; to ring (alarm); to go bad (food)', ex:'"My alarm went off at 5am."', cat:'go' },
+  { verb:'go', pv:'go on', def:'To continue; to happen', ex:'"What\'s going on in here?"', cat:'go' },
+  { verb:'go', pv:'go over', def:'To review or examine carefully', ex:'"Let\'s go over the plan one more time."', cat:'go' },
+  { verb:'go', pv:'go through', def:'To experience something difficult; to check thoroughly', ex:'"She\'s going through a tough time."', cat:'go' },
+  // HOLD
+  { verb:'hold', pv:'hold back', def:'To stop yourself from doing something; to restrain', ex:'"He held back his tears."', cat:'hold' },
+  { verb:'hold', pv:'hold on', def:'To wait; to grip tightly', ex:'"Hold on a second — let me check."', cat:'hold' },
+  { verb:'hold', pv:'hold out', def:'To resist; to last for a period of time', ex:'"Can you hold out a bit longer?"', cat:'hold' },
+  { verb:'hold', pv:'hold up', def:'To delay; to rob; to remain strong', ex:'"The traffic held us up for an hour."', cat:'hold' },
+  // KEEP
+  { verb:'keep', pv:'keep on', def:'To continue doing something', ex:'"Keep on trying — don\'t give up."', cat:'keep' },
+  { verb:'keep', pv:'keep up', def:'To maintain the same pace or level as others', ex:'"I can\'t keep up with all these messages."', cat:'keep' },
+  { verb:'keep', pv:'keep up with', def:'To stay informed about something', ex:'"It\'s hard to keep up with all the news."', cat:'keep' },
+  // LOOK
+  { verb:'look', pv:'look after', def:'To take care of someone or something', ex:'"Can you look after my cat this weekend?"', cat:'look' },
+  { verb:'look', pv:'look down on', def:'To consider someone or something inferior', ex:'"She looks down on people who don\'t have degrees."', cat:'look' },
+  { verb:'look', pv:'look for', def:'To search for something', ex:'"I\'m looking for my keys."', cat:'look' },
+  { verb:'look', pv:'look forward to', def:'To feel excited about a future event', ex:'"I\'m looking forward to the holiday."', cat:'look' },
+  { verb:'look', pv:'look into', def:'To investigate or research something', ex:'"Police are looking into the incident."', cat:'look' },
+  { verb:'look', pv:'look out', def:'To be careful; to watch for danger', ex:'"Look out — there\'s a car coming!"', cat:'look' },
+  { verb:'look', pv:'look up', def:'To search for information; to improve', ex:'"Look it up in the dictionary."', cat:'look' },
+  { verb:'look', pv:'look up to', def:'To admire and respect someone', ex:'"She looks up to her older sister."', cat:'look' },
+  // MAKE
+  { verb:'make', pv:'make out', def:'To see or hear with difficulty; to manage; to kiss', ex:'"I could barely make out the words."', cat:'make' },
+  { verb:'make', pv:'make up', def:'To invent a story; to reconcile after a fight; to apply cosmetics', ex:'"He made up an excuse for being late."', cat:'make' },
+  { verb:'make', pv:'make up for', def:'To compensate for something bad or lost', ex:'"He brought flowers to make up for being rude."', cat:'make' },
+  // PICK
+  { verb:'pick', pv:'pick out', def:'To choose or identify something from a group', ex:'"Can you pick out the one you like best?"', cat:'pick' },
+  { verb:'pick', pv:'pick up', def:'To collect; to learn casually; to answer a phone', ex:'"I picked up some Spanish while traveling."', cat:'pick' },
+  { verb:'pick', pv:'pick up on', def:'To notice or detect something subtle', ex:'"She quickly picked up on the tension in the room."', cat:'pick' },
+  // PUT
+  { verb:'put', pv:'put aside', def:'To save money; to ignore feelings temporarily', ex:'"Let\'s put our differences aside."', cat:'put' },
+  { verb:'put', pv:'put down', def:'To insult someone; to write down; to pay a deposit', ex:'"Stop putting yourself down all the time."', cat:'put' },
+  { verb:'put', pv:'put off', def:'To postpone; to cause dislike or disgust', ex:'"Don\'t put off what you can do today."', cat:'put' },
+  { verb:'put', pv:'put on', def:'To wear; to organize an event; to pretend', ex:'"Put on your jacket — it\'s cold."', cat:'put' },
+  { verb:'put', pv:'put out', def:'To extinguish a fire; to publish; to inconvenience', ex:'"It took hours to put out the fire."', cat:'put' },
+  { verb:'put', pv:'put up with', def:'To tolerate something unpleasant', ex:'"I\'m not going to put up with this behavior."', cat:'put' },
+  // RUN
+  { verb:'run', pv:'run away', def:'To escape from a place or situation', ex:'"He ran away from home at 16."', cat:'run' },
+  { verb:'run', pv:'run into', def:'To meet someone unexpectedly; to collide with', ex:'"I ran into an old friend at the mall."', cat:'run' },
+  { verb:'run', pv:'run out of', def:'To use all of something and have none left', ex:'"We\'ve run out of milk."', cat:'run' },
+  { verb:'run', pv:'run over', def:'To hit with a vehicle; to review briefly; to exceed a time limit', ex:'"The meeting ran over by 20 minutes."', cat:'run' },
+  // SET
+  { verb:'set', pv:'set off', def:'To begin a journey; to trigger an alarm or reaction', ex:'"We set off early to avoid traffic."', cat:'set' },
+  { verb:'set', pv:'set out', def:'To begin a journey or task with a goal', ex:'"She set out to prove everyone wrong."', cat:'set' },
+  { verb:'set', pv:'set up', def:'To arrange or establish something; to prepare equipment', ex:'"They set up a new company last year."', cat:'set' },
+  // SHOW
+  { verb:'show', pv:'show off', def:'To display your skills or possessions to impress others', ex:'"He was just showing off his new car."', cat:'show' },
+  { verb:'show', pv:'show up', def:'To arrive or appear, especially unexpectedly', ex:'"She never showed up to the party."', cat:'show' },
+  // TAKE
+  { verb:'take', pv:'take after', def:'To resemble a parent or relative in appearance or behavior', ex:'"She really takes after her mother."', cat:'take' },
+  { verb:'take', pv:'take back', def:'To withdraw a statement; to return something to a store', ex:'"I take back everything I said."', cat:'take' },
+  { verb:'take', pv:'take off', def:'To leave the ground (plane); to become successful; to remove clothing', ex:'"The startup really took off last year."', cat:'take' },
+  { verb:'take', pv:'take on', def:'To accept responsibility; to compete against; to hire', ex:'"She took on too much work this month."', cat:'take' },
+  { verb:'take', pv:'take over', def:'To assume control of something', ex:'"A larger company took over the startup."', cat:'take' },
+  { verb:'take', pv:'take up', def:'To begin a hobby; to occupy space or time', ex:'"He took up running last year."', cat:'take' },
+  // TURN
+  { verb:'turn', pv:'turn down', def:'To refuse or reject; to reduce volume or heat', ex:'"She turned down the job offer."', cat:'turn' },
+  { verb:'turn', pv:'turn into', def:'To become something different', ex:'"The project turned into a disaster."', cat:'turn' },
+  { verb:'turn', pv:'turn off', def:'To stop a device; to cause dislike', ex:'"Turn off the lights when you leave."', cat:'turn' },
+  { verb:'turn', pv:'turn on', def:'To start a device; to attack suddenly', ex:'"Turn on the air conditioning."', cat:'turn' },
+  { verb:'turn', pv:'turn out', def:'To result in a particular way; to attend an event', ex:'"It turned out better than expected."', cat:'turn' },
+  { verb:'turn', pv:'turn up', def:'To arrive; to increase volume; to appear unexpectedly', ex:'"He turned up an hour late."', cat:'turn' },
+  // WORK
+  { verb:'work', pv:'work on', def:'To spend time improving or developing something', ex:'"I\'m working on my English pronunciation."', cat:'work' },
+  { verb:'work', pv:'work out', def:'To exercise; to solve; to develop successfully', ex:'"I hope things work out for you."', cat:'work' },
+  { verb:'work', pv:'work up', def:'To gradually develop a feeling; to prepare yourself', ex:'"I can\'t work up the courage to ask her out."', cat:'work' },
+];
+
+const VERBS = [...new Set(PVS.map(p => p.cat))].sort();
+let mode = 'list';
+let activeVerb = 'all';
+let fcCards = [], fcIndex = 0, fcResults = {}, fcFlipped = false;
+let quizCards = [], quizIndex = 0, qCorrect = 0, qWrong = 0;
+let known = new Set(JSON.parse(localStorage.getItem('pv-known') || '[]'));
+
+function setMode(m) {
+  mode = m;
+  ['list','cards','quiz'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === m);
+    document.getElementById('pane-' + t).style.display = t === m ? '' : 'none';
+  });
+  if (m === 'cards') initCards();
+  if (m === 'quiz')  initQuiz();
+}
+
+// LIST MODE
+function buildVerbFilter() {
+  const vf = document.getElementById('verb-filter');
+  vf.innerHTML = `<button class="vf-btn active" onclick="filterVerb('all', this)">All</button>` +
+    VERBS.map(v => `<button class="vf-btn" onclick="filterVerb('${v}', this)">${v}</button>`).join('');
+}
+
+function filterVerb(v, btn) {
+  activeVerb = v;
+  document.querySelectorAll('.vf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function renderList() {
+  const q = (document.getElementById('list-search')?.value || '').toLowerCase();
+  const items = PVS.filter(p =>
+    (activeVerb === 'all' || p.cat === activeVerb) &&
+    (!q || p.pv.includes(q) || p.def.toLowerCase().includes(q))
+  );
+  document.getElementById('list-count').innerHTML = `Showing <span>${items.length}</span> of <span>${PVS.length}</span> phrasal verbs`;
+  document.getElementById('pv-list').innerHTML = items.map(p =>
+    `<div class="pv-item">
+      <div class="pv-verb">${p.pv}</div>
+      <div class="pv-body">
+        <div class="pv-def">${p.def}</div>
+        <div class="pv-ex">${p.ex}</div>
+      </div>
+      <button class="know-toggle${known.has(p.pv) ? ' known' : ''}" onclick="toggleKnown('${p.pv}', this)" title="Mark as known">✅</button>
+    </div>`
+  ).join('');
+}
+
+function toggleKnown(pv, btn) {
+  if (known.has(pv)) known.delete(pv); else known.add(pv);
+  localStorage.setItem('pv-known', JSON.stringify([...known]));
+  btn.classList.toggle('known', known.has(pv));
+}
+
+// FLASHCARD MODE
+function buildFcSelect() {
+  const sel = document.getElementById('fc-filter');
+  const qsel = document.getElementById('quiz-filter');
+  [sel, qsel].forEach(s => {
+    VERBS.forEach(v => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = v + ' (phrasal verbs)';
+      s.appendChild(o);
+    });
+  });
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function initCards(cards) {
+  const filter = document.getElementById('fc-filter').value;
+  fcCards = shuffle(cards || PVS.filter(p => filter === 'all' || p.cat === filter));
+  fcIndex = 0; fcResults = {}; fcFlipped = false;
+  document.getElementById('fc-done').style.display = 'none';
+  showFcCard();
+}
+
+function showFcCard() {
+  if (fcIndex >= fcCards.length) { showFcDone(); return; }
+  const c = fcCards[fcIndex];
+  document.getElementById('fc-pv').textContent = c.pv;
+  document.getElementById('fc-def').textContent = c.def;
+  document.getElementById('fc-ex').textContent = c.ex;
+  document.getElementById('fc-num').textContent = `${fcIndex + 1} / ${fcCards.length}`;
+  document.getElementById('fc-inner').classList.remove('flipped');
+  fcFlipped = false;
+  const pct = (fcIndex / fcCards.length) * 100;
+  document.getElementById('fc-prog').style.width = pct + '%';
+  document.getElementById('fc-prog-label').textContent = `${fcIndex} / ${fcCards.length}`;
+}
+
+function fcFlip() {
+  fcFlipped = !fcFlipped;
+  document.getElementById('fc-inner').classList.toggle('flipped', fcFlipped);
+}
+
+function fcMark(knew) {
+  fcResults[fcCards[fcIndex].pv] = knew;
+  fcIndex++;
+  showFcCard();
+}
+
+function fcPrev() { if (fcIndex > 0) { fcIndex--; showFcCard(); } }
+
+function fcStudyMissed() {
+  const missed = fcCards.filter(c => fcResults[c.pv] === false);
+  if (!missed.length) return;
+  initCards(missed);
+}
+
+function fcStudyMissedFinal() {
+  document.getElementById('fc-done').style.display = 'none';
+  fcStudyMissed();
+}
+
+function showFcDone() {
+  const total = fcCards.length;
+  const knew = Object.values(fcResults).filter(Boolean).length;
+  document.getElementById('fc-score-label').textContent = `You knew ${knew} of ${total} cards (${Math.round(knew/total*100)}%)`;
+  document.getElementById('fc-done').style.display = 'block';
+}
+
+// QUIZ MODE
+function initQuiz(cards) {
+  const filter = document.getElementById('quiz-filter').value;
+  quizCards = shuffle(cards || PVS.filter(p => filter === 'all' || p.cat === filter));
+  quizIndex = 0; qCorrect = 0; qWrong = 0;
+  document.getElementById('q-correct').textContent = 0;
+  document.getElementById('q-wrong').textContent = 0;
+  showQuiz();
+}
+
+function showQuiz() {
+  if (quizIndex >= quizCards.length) {
+    document.getElementById('quiz-q').textContent = '🎉 Quiz complete!';
+    document.getElementById('quiz-hint').textContent = `Final score: ${qCorrect}/${quizCards.length}`;
+    document.getElementById('quiz-opts').innerHTML = '';
+    document.getElementById('quiz-feedback').textContent = '';
+    return;
+  }
+  const c = quizCards[quizIndex];
+  document.getElementById('quiz-q').textContent = c.pv;
+  document.getElementById('quiz-hint').textContent = c.ex;
+  document.getElementById('quiz-feedback').textContent = '';
+
+  const pct = (quizIndex / quizCards.length) * 100;
+  document.getElementById('quiz-prog').style.width = pct + '%';
+  document.getElementById('quiz-prog-label').textContent = `${quizIndex} / ${quizCards.length}`;
+
+  // 4 options: 1 correct + 3 random wrong
+  const others = shuffle(PVS.filter(p => p.pv !== c.pv)).slice(0, 3);
+  const options = shuffle([c, ...others]);
+
+  document.getElementById('quiz-opts').innerHTML = options.map(o =>
+    `<button class="quiz-opt" onclick="answerQuiz('${o.pv.replace(/'/g,"\\'")}', '${c.pv.replace(/'/g,"\\'")}', this)">${o.def.split(';')[0]}</button>`
+  ).join('');
+}
+
+function answerQuiz(chosen, correct, btn) {
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(b => b.disabled = true);
+
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    opts.forEach(b => { if (b.textContent === PVS.find(p => p.pv === correct)?.def.split(';')[0]) b.classList.add('correct'); });
+  }
+
+  if (isCorrect) qCorrect++; else qWrong++;
+  document.getElementById('q-correct').textContent = qCorrect;
+  document.getElementById('q-wrong').textContent = qWrong;
+  document.getElementById('quiz-feedback').textContent = isCorrect ? '✓ Correct!' : `✗ The answer was: "${correct}"`;
+
+  quizIndex++;
+  setTimeout(showQuiz, 1100);
+}
+
+// Keyboard shortcuts (flashcards)
+document.addEventListener('keydown', e => {
+  if (mode !== 'cards') return;
+  if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); fcFlip(); }
+  if (e.key === 'ArrowRight') fcMark(true);
+  if (e.key === 'ArrowLeft') fcMark(false);
+});
+
+buildVerbFilter();
+buildFcSelect();
+renderList();
+initCards();
+initQuiz();
+</script>
+
+</body>
+</html>

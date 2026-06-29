@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English Flashcards — Vocabulary, Idioms & Phrases | G9 Toolkit</title>
+  <meta name="description" content="Free English flashcard app for learners. Practice vocabulary, idioms, collocations, and more. Flip cards, track progress, and shuffle decks. No signup required." />
+  <meta property="og:title" content="English Flashcards | G9 Toolkit" />
+  <meta property="og:description" content="Free flashcard app for English learners. Vocabulary, idioms, collocations — study at your own pace." />
+  <link rel="canonical" href="https://g9toolkit.com/flashcards/" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <style>
+    body { background: #f1f5f9; }
+    .fc-wrap { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+    /* Deck selector */
+    .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .deck-btn {
+      padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px;
+      background: #fff; cursor: pointer; text-align: left; transition: all 0.15s;
+    }
+    .deck-btn:hover { border-color: #2563eb; box-shadow: 0 2px 12px rgba(37,99,235,0.1); }
+    .deck-btn.active { border-color: #2563eb; background: #eff6ff; }
+    .deck-btn .deck-icon { font-size: 1.5rem; margin-bottom: 0.35rem; }
+    .deck-btn .deck-name { font-weight: 700; font-size: 0.9rem; color: #1e293b; }
+    .deck-btn .deck-count { font-size: 0.75rem; color: #94a3b8; margin-top: 0.15rem; }
+
+    /* Progress bar */
+    .progress-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .prog-bar-wrap { flex: 1; background: #e2e8f0; border-radius: 999px; height: 8px; }
+    .prog-bar { background: #2563eb; height: 8px; border-radius: 999px; transition: width 0.4s; }
+    .prog-label { font-size: 0.8rem; color: #64748b; white-space: nowrap; }
+
+    /* Card */
+    .card-scene { perspective: 1200px; height: 260px; margin-bottom: 1.25rem; cursor: pointer; }
+    .card-inner {
+      width: 100%; height: 100%; position: relative;
+      transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+    .card-inner.flipped { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute; inset: 0; backface-visibility: hidden;
+      border-radius: 16px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 2rem;
+      text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .card-front { background: #fff; border: 2px solid #e2e8f0; }
+    .card-back  { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; transform: rotateY(180deg); }
+    .card-hint { font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+    .card-word { font-size: 1.9rem; font-weight: 800; color: #1e293b; margin-bottom: 0.4rem; line-height: 1.2; }
+    .card-pos   { font-size: 0.8rem; color: #94a3b8; font-style: italic; margin-bottom: 0.25rem; }
+    .card-back .card-hint { color: rgba(255,255,255,0.65); }
+    .card-def   { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 0.6rem; line-height: 1.4; }
+    .card-example { font-size: 0.85rem; color: rgba(255,255,255,0.8); font-style: italic; line-height: 1.5; }
+    .card-num { font-size: 0.78rem; color: #94a3b8; margin-top: 0.75rem; }
+
+    /* Controls */
+    .controls { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .ctrl-btn {
+      padding: 0.55rem 1.1rem; border-radius: 8px; border: 1.5px solid #e2e8f0;
+      background: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      color: #475569; transition: all 0.15s;
+    }
+    .ctrl-btn:hover { background: #f1f5f9; }
+    .ctrl-btn.know   { border-color: #22c55e; color: #16a34a; }
+    .ctrl-btn.know:hover { background: #f0fdf4; }
+    .ctrl-btn.skip   { border-color: #ef4444; color: #dc2626; }
+    .ctrl-btn.skip:hover { background: #fef2f2; }
+    .ctrl-btn.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .ctrl-btn.primary:hover { background: #1d4ed8; }
+    .flip-hint { text-align: center; font-size: 0.78rem; color: #94a3b8; margin-bottom: 1rem; }
+
+    /* Summary */
+    .summary-box {
+      background: #fff; border-radius: 16px; padding: 2.5rem 2rem; text-align: center;
+      border: 1px solid #e2e8f0; display: none;
+    }
+    .summary-box.show { display: block; }
+    .summary-box h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .summary-stat { font-size: 3rem; font-weight: 800; color: #2563eb; margin: 0.5rem 0; }
+    .summary-sub { color: #64748b; margin-bottom: 1.5rem; }
+
+    /* Known badges */
+    .known-list { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin: 1rem 0; }
+    .known-tag { padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+    .known-tag.know { background: #dcfce7; color: #16a34a; }
+    .known-tag.skip { background: #fee2e2; color: #dc2626; }
+
+    @media (max-width: 500px) { .card-word { font-size: 1.4rem; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+    <nav>
+      <a href="/phrasal-verbs/">Phrasal Verbs</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<div class="fc-wrap">
+  <h1 class="tool-title" style="text-align:center;">English Flashcards</h1>
+  <p class="tool-subtitle" style="text-align:center;margin-bottom:1.5rem;">Choose a deck and start studying — tap a card to flip it</p>
+
+  <div class="ad-slot ad-slot-banner" style="margin-bottom:1.25rem;"></div>
+
+  <!-- Deck selector -->
+  <div class="deck-grid" id="deck-grid"></div>
+
+  <!-- Study area -->
+  <div id="study-area" style="display:none">
+    <div class="progress-row">
+      <div class="prog-bar-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
+      <div class="prog-label" id="prog-label">0 / 0</div>
+    </div>
+
+    <div class="card-scene" onclick="flipCard()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-face card-front">
+          <div class="card-hint">Tap to reveal</div>
+          <div class="card-word" id="card-word">—</div>
+          <div class="card-pos"  id="card-pos"></div>
+          <div class="card-num" id="card-num"></div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-hint">Definition</div>
+          <div class="card-def" id="card-def"></div>
+          <div class="card-example" id="card-example"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-hint">← Swipe or use buttons below →</div>
+
+    <div class="controls">
+      <button class="ctrl-btn skip" onclick="markCard(false)">✗ Don't know</button>
+      <button class="ctrl-btn"      onclick="flipCard()">↩ Flip</button>
+      <button class="ctrl-btn know" onclick="markCard(true)">✓ Got it</button>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="prevCard()">← Prev</button>
+      <button class="ctrl-btn" onclick="shuffleDeck()">🔀 Shuffle</button>
+      <button class="ctrl-btn" onclick="backToDecks()">◀ Decks</button>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-box" id="summary-box">
+    <div style="font-size:2.5rem">🎉</div>
+    <h2>Deck complete!</h2>
+    <div class="summary-stat" id="sum-pct">—</div>
+    <div class="summary-sub" id="sum-sub"></div>
+    <div class="known-list" id="sum-tags"></div>
+    <div class="controls" style="justify-content:center;margin-top:1rem;">
+      <button class="ctrl-btn primary" onclick="restartDeck()">↻ Study again</button>
+      <button class="ctrl-btn" onclick="studyMissed()">📌 Study missed cards</button>
+      <button class="ctrl-btn" onclick="backToDecks()">◀ All decks</button>
+    </div>
+  </div>
+
+  <div class="card prose" style="margin-top:2rem;">
+    <h2>How to use these flashcards</h2>
+    <p>Each card shows an English word or phrase on the front. Tap or click to flip it and see the definition and an example sentence. Mark cards as "Got it" to track your progress — the progress bar fills as you work through the deck.</p>
+    <p>Use <strong>Shuffle</strong> to randomize card order. If you finish a deck, you can restart it or focus only on the cards you missed. Your progress is saved automatically in your browser.</p>
+    <h2>Tips for vocabulary retention</h2>
+    <p>Research on spaced repetition shows that reviewing material at increasing intervals — minutes, hours, days — dramatically improves long-term retention. Don't try to learn every word in one session. Study a deck once, then return to it after a day, then a week. Focus on the cards you missed.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+      <p>Free online tools that run in your browser. No account needed.</p>
+    </div>
+    <div class="footer-links">
+      <h4>English Tools</h4>
+      <a href="/flashcards/">English Flashcards</a>
+      <a href="/phrasal-verbs/">Phrasal Verbs</a>
+    </div>
+    <div class="footer-links">
+      <h4>Other Tools</h4>
+      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/bmi/">BMI Calculator</a>
+      <a href="/world-clock/">World Clock</a>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved.</div>
+</footer>
+
+<script>
+const DECKS = [
+  {
+    id: 'b1-vocab',
+    icon: '📗',
+    name: 'B1 Vocabulary',
+    desc: 'Intermediate everyday words',
+    cards: [
+      { word:'accomplish', pos:'verb', def:'To succeed in doing something difficult', ex:'"She accomplished her goal of running a marathon."' },
+      { word:'adequate', pos:'adjective', def:'Enough for a particular purpose; satisfactory', ex:'"The hotel was adequate but not luxurious."' },
+      { word:'ambiguous', pos:'adjective', def:'Having more than one possible meaning; unclear', ex:'"His answer was ambiguous — we couldn\'t tell if he agreed."' },
+      { word:'anticipate', pos:'verb', def:'To expect something and prepare for it', ex:'"We anticipated heavy traffic and left early."' },
+      { word:'apparent', pos:'adjective', def:'Clearly seen or understood; obvious', ex:'"It was apparent that she hadn\'t slept."' },
+      { word:'approach', pos:'verb/noun', def:'To come near to; a way of dealing with something', ex:'"We need a new approach to solving this problem."' },
+      { word:'assume', pos:'verb', def:'To accept something as true without proof', ex:'"Don\'t assume he knows — tell him directly."' },
+      { word:'beneficial', pos:'adjective', def:'Producing good results; helpful', ex:'"Exercise is beneficial for mental health."' },
+      { word:'capable', pos:'adjective', def:'Having the ability or qualities to do something', ex:'"She is capable of managing the whole team."' },
+      { word:'cautious', pos:'adjective', def:'Careful to avoid danger or risk', ex:'"Be cautious when crossing a busy street."' },
+      { word:'circumstances', pos:'noun', def:'The facts or conditions that affect a situation', ex:'"Under normal circumstances, this would take a week."' },
+      { word:'commit', pos:'verb', def:'To dedicate yourself to something; to do something wrong', ex:'"He committed himself to finishing the project."' },
+      { word:'complex', pos:'adjective', def:'Made of many connected parts; not simple', ex:'"The human brain is incredibly complex."' },
+      { word:'concentrate', pos:'verb', def:'To focus your attention on something', ex:'"I can\'t concentrate with all this noise."' },
+      { word:'confident', pos:'adjective', def:'Sure of yourself; believing in your own abilities', ex:'"She felt confident about the interview."' },
+      { word:'consequence', pos:'noun', def:'A result of something that happened', ex:'"Actions have consequences you can\'t always predict."' },
+      { word:'considerable', pos:'adjective', def:'Large in size or amount; significant', ex:'"The project required considerable effort."' },
+      { word:'contribute', pos:'verb', def:'To give something toward a common goal', ex:'"Everyone should contribute to the team\'s success."' },
+      { word:'convenient', pos:'adjective', def:'Easy to use or access; suitable', ex:'"The store is in a very convenient location."' },
+      { word:'cooperate', pos:'verb', def:'To work together toward the same goal', ex:'"The two companies cooperated on the project."' },
+    ]
+  },
+  {
+    id: 'b2-vocab',
+    icon: '📘',
+    name: 'B2 Vocabulary',
+    desc: 'Upper-intermediate power words',
+    cards: [
+      { word:'acknowledge', pos:'verb', def:'To accept or admit that something is true', ex:'"He acknowledged that he had made a mistake."' },
+      { word:'alleviate', pos:'verb', def:'To make something bad less severe', ex:'"The medicine helped alleviate the pain."' },
+      { word:'arbitrary', pos:'adjective', def:'Based on chance or personal whim, not reason', ex:'"The decision seemed completely arbitrary."' },
+      { word:'articulate', pos:'adjective/verb', def:'Able to express ideas clearly; to express clearly', ex:'"She is a very articulate speaker."' },
+      { word:'assert', pos:'verb', def:'To state or declare something confidently', ex:'"He asserted his right to a fair trial."' },
+      { word:'coherent', pos:'adjective', def:'Logical and consistent; easy to understand', ex:'"Please give a coherent explanation of what happened."' },
+      { word:'compelling', pos:'adjective', def:'Very interesting or persuasive; impossible to ignore', ex:'"The documentary made a compelling case for change."' },
+      { word:'concise', pos:'adjective', def:'Short and clear, giving the necessary information', ex:'"Write a concise summary of the article."' },
+      { word:'contemplate', pos:'verb', def:'To think carefully about something for a long time', ex:'"She contemplated her career options."' },
+      { word:'contradict', pos:'verb', def:'To say the opposite of what someone else said', ex:'"The witness\'s story contradicted the evidence."' },
+      { word:'deduce', pos:'verb', def:'To reach a conclusion by reasoning from evidence', ex:'"From the evidence, we can deduce what happened."' },
+      { word:'diminish', pos:'verb', def:'To make or become smaller or less', ex:'"His enthusiasm did not diminish over time."' },
+      { word:'elaborate', pos:'verb/adjective', def:'To add more detail; involving many parts', ex:'"Could you elaborate on your point?"' },
+      { word:'emphasize', pos:'verb', def:'To give special importance to something', ex:'"I want to emphasize how critical this deadline is."' },
+      { word:'encounter', pos:'verb/noun', def:'To unexpectedly meet or experience', ex:'"She encountered many challenges along the way."' },
+      { word:'endure', pos:'verb', def:'To suffer something patiently; to last over time', ex:'"He endured months of treatment."' },
+      { word:'exhibit', pos:'verb', def:'To display or show something', ex:'"The patient exhibited signs of stress."' },
+      { word:'facilitate', pos:'verb', def:'To make something easier or more possible', ex:'"Technology facilitates communication across distances."' },
+      { word:'fundamental', pos:'adjective', def:'Basic and most important; essential', ex:'"Trust is fundamental to any relationship."' },
+      { word:'inevitable', pos:'adjective', def:'Certain to happen and impossible to avoid', ex:'"Some degree of change is inevitable."' },
+    ]
+  },
+  {
+    id: 'idioms',
+    icon: '💬',
+    name: 'Common Idioms',
+    desc: 'Expressions native speakers use daily',
+    cards: [
+      { word:'bite the bullet', pos:'idiom', def:'To endure a painful or difficult situation bravely', ex:'"I bit the bullet and told my boss the bad news."' },
+      { word:'break the ice', pos:'idiom', def:'To do or say something to reduce tension and make people feel comfortable', ex:'"He told a joke to break the ice at the meeting."' },
+      { word:'burn bridges', pos:'idiom', def:'To permanently damage a relationship by your actions', ex:'"Don\'t burn bridges — you may need their help later."' },
+      { word:'cut corners', pos:'idiom', def:'To do something in the cheapest or easiest way, reducing quality', ex:'"They cut corners on safety and it caused an accident."' },
+      { word:'the ball is in your court', pos:'idiom', def:'It is now your turn to take action or make a decision', ex:'"I\'ve made my offer — the ball is in your court."' },
+      { word:'get cold feet', pos:'idiom', def:'To suddenly become nervous or hesitant about doing something', ex:'"He got cold feet just before the presentation."' },
+      { word:'hit the nail on the head', pos:'idiom', def:'To describe exactly what is causing a situation or problem', ex:'"You hit the nail on the head with that observation."' },
+      { word:'kill two birds with one stone', pos:'idiom', def:'To achieve two things with one action', ex:'"I\'ll stop by the bank on the way to work — kill two birds with one stone."' },
+      { word:'miss the boat', pos:'idiom', def:'To miss an opportunity; to be too late', ex:'"He missed the boat on investing in that company."' },
+      { word:'once in a blue moon', pos:'idiom', def:'Very rarely', ex:'"I only eat fast food once in a blue moon."' },
+      { word:'on the fence', pos:'idiom', def:'Undecided between two options', ex:'"I\'m still on the fence about which job offer to accept."' },
+      { word:'pull someone\'s leg', pos:'idiom', def:'To tease someone by telling them something untrue', ex:'"Don\'t worry — I was just pulling your leg!"' },
+      { word:'speak of the devil', pos:'idiom', def:'Said when someone who was just mentioned appears', ex:'"Speak of the devil — here comes James now."' },
+      { word:'spill the beans', pos:'idiom', def:'To reveal secret information, usually by accident', ex:'"Who spilled the beans about the surprise party?"' },
+      { word:'the last straw', pos:'idiom', def:'The final problem that makes you give up or react', ex:'"Being late again was the last straw — she quit."' },
+      { word:'under the weather', pos:'idiom', def:'Feeling slightly ill', ex:'"I\'m feeling a bit under the weather today."' },
+      { word:'up in the air', pos:'idiom', def:'Uncertain; not yet decided', ex:'"The meeting time is still up in the air."' },
+      { word:'wear your heart on your sleeve', pos:'idiom', def:'To openly show your emotions', ex:'"He wears his heart on his sleeve — everyone knows when he\'s upset."' },
+      { word:'a blessing in disguise', pos:'idiom', def:'Something that seems bad at first but turns out good', ex:'"Losing that job was a blessing in disguise."' },
+      { word:'add fuel to the fire', pos:'idiom', def:'To make a bad situation worse', ex:'"His comment just added fuel to the fire."' },
+    ]
+  },
+  {
+    id: 'collocations',
+    icon: '🔗',
+    name: 'Collocations',
+    desc: 'Words that naturally go together',
+    cards: [
+      { word:'make a decision', pos:'collocation', def:'"Make" + decision (not "do a decision")', ex:'"I need more time to make a decision."' },
+      { word:'do research', pos:'collocation', def:'"Do" + research (not "make research")', ex:'"She spent years doing research on climate change."' },
+      { word:'take a risk', pos:'collocation', def:'"Take" + risk — to do something dangerous or uncertain', ex:'"Starting a business means taking a risk."' },
+      { word:'have a conversation', pos:'collocation', def:'"Have" + conversation — to talk with someone', ex:'"We need to have a serious conversation."' },
+      { word:'pay attention', pos:'collocation', def:'"Pay" + attention (not "give attention")', ex:'"Please pay attention to the instructions."' },
+      { word:'make progress', pos:'collocation', def:'"Make" + progress — to improve or move forward', ex:'"We\'re making good progress on the project."' },
+      { word:'take advantage of', pos:'collocation', def:'"Take advantage of" — to use an opportunity', ex:'"Take advantage of the sale while it lasts."' },
+      { word:'reach a conclusion', pos:'collocation', def:'"Reach" + conclusion (not "arrive a conclusion")', ex:'"After the meeting, we reached a conclusion."' },
+      { word:'raise a question', pos:'collocation', def:'"Raise" + question — to bring up an issue', ex:'"His comments raised some important questions."' },
+      { word:'keep in touch', pos:'collocation', def:'"Keep in touch" — to stay in contact with someone', ex:'"Let\'s keep in touch after you move."' },
+      { word:'break a habit', pos:'collocation', def:'"Break" + habit — to stop doing something you regularly do', ex:'"It\'s hard to break a bad habit."' },
+      { word:'meet a deadline', pos:'collocation', def:'"Meet" + deadline — to finish something on time', ex:'"The team worked overtime to meet the deadline."' },
+      { word:'launch a campaign', pos:'collocation', def:'"Launch" + campaign — to start an organized activity', ex:'"They launched a marketing campaign last month."' },
+      { word:'draw a conclusion', pos:'collocation', def:'"Draw" + conclusion — to decide something based on evidence', ex:'"It\'s too early to draw any conclusions."' },
+      { word:'set a goal', pos:'collocation', def:'"Set" + goal — to decide what you want to achieve', ex:'"Set realistic goals and work toward them."' },
+      { word:'lose track of time', pos:'collocation', def:'To forget about time while doing something', ex:'"I lost track of time while reading."' },
+      { word:'gain experience', pos:'collocation', def:'"Gain" + experience — to get experience through practice', ex:'"She gained a lot of experience as an intern."' },
+      { word:'run a business', pos:'collocation', def:'"Run" + business — to manage and operate a company', ex:'"Running a business requires patience and resilience."' },
+      { word:'solve a problem', pos:'collocation', def:'"Solve" + problem (not "resolve a problem" in informal use)', ex:'"We need to solve this problem quickly."' },
+      { word:'express an opinion', pos:'collocation', def:'"Express" + opinion — to share your view on something', ex:'"Everyone is free to express their opinion here."' },
+    ]
+  },
+  {
+    id: 'formal-writing',
+    icon: '✍️',
+    name: 'Formal Writing',
+    desc: 'Academic and professional English',
+    cards: [
+      { word:'furthermore', pos:'adverb', def:'In addition; used to add a supporting point', ex:'"The plan is cost-effective. Furthermore, it is easy to implement."' },
+      { word:'nevertheless', pos:'adverb', def:'Despite that; however', ex:'"The task was difficult. Nevertheless, she completed it."' },
+      { word:'consequently', pos:'adverb', def:'As a result of something', ex:'"He missed the deadline. Consequently, the project was delayed."' },
+      { word:'in contrast', pos:'phrase', def:'Used to show a difference between two things', ex:'"In contrast, the second method is much faster."' },
+      { word:'to illustrate', pos:'phrase', def:'Used to give an example', ex:'"To illustrate this point, consider the following case."' },
+      { word:'it is worth noting', pos:'phrase', def:'Used to highlight something important', ex:'"It is worth noting that the results varied significantly."' },
+      { word:'on the other hand', pos:'phrase', def:'Used to introduce a contrasting point', ex:'"The salary is low. On the other hand, the work is rewarding."' },
+      { word:'in light of', pos:'phrase', def:'Because of; considering', ex:'"In light of the new evidence, we must revise our conclusion."' },
+      { word:'to a certain extent', pos:'phrase', def:'Partly; to some degree', ex:'"To a certain extent, success depends on luck."' },
+      { word:'with respect to', pos:'phrase', def:'Regarding; concerning', ex:'"With respect to your question, here is my answer."' },
+      { word:'it could be argued', pos:'phrase', def:'Used to introduce a point in a neutral way', ex:'"It could be argued that the policy was too strict."' },
+      { word:'as a result', pos:'phrase', def:'Because of something that was previously mentioned', ex:'"He trained hard. As a result, he won the race."' },
+      { word:'to sum up', pos:'phrase', def:'Used to introduce a summary', ex:'"To sum up, the evidence supports the original hypothesis."' },
+      { word:'in accordance with', pos:'phrase', def:'Following or obeying a rule, law, or agreement', ex:'"Please act in accordance with company policy."' },
+      { word:'henceforth', pos:'adverb', def:'From this time on; from now on', ex:'"Henceforth, all reports must be submitted digitally."' },
+    ]
+  },
+];
+
+let currentDeck = null;
+let currentCards = [];
+let currentIndex = 0;
+let results = {};
+let flipped = false;
+
+function buildDecks() {
+  const grid = document.getElementById('deck-grid');
+  grid.innerHTML = DECKS.map(d =>
+    `<button class="deck-btn" onclick="startDeck('${d.id}')">
+      <div class="deck-icon">${d.icon}</div>
+      <div class="deck-name">${d.name}</div>
+      <div class="deck-count">${d.cards.length} cards · ${d.desc}</div>
+    </button>`
+  ).join('');
+}
+
+function startDeck(id, cards) {
+  currentDeck = DECKS.find(d => d.id === id) || currentDeck;
+  currentCards = cards || [...currentDeck.cards];
+  currentIndex = 0;
+  results = {};
+  flipped = false;
+
+  document.getElementById('deck-grid').style.display = 'none';
+  document.getElementById('study-area').style.display = '';
+  document.getElementById('summary-box').classList.remove('show');
+  document.querySelectorAll('.deck-btn').forEach(b => b.classList.remove('active'));
+
+  showCard();
+}
+
+function showCard() {
+  if (currentIndex >= currentCards.length) { showSummary(); return; }
+
+  const c = currentCards[currentIndex];
+  document.getElementById('card-word').textContent = c.word;
+  document.getElementById('card-pos').textContent = c.pos || '';
+  document.getElementById('card-def').textContent = c.def;
+  document.getElementById('card-example').textContent = c.ex || '';
+  document.getElementById('card-num').textContent = `${currentIndex + 1} / ${currentCards.length}`;
+  document.getElementById('card-inner').classList.remove('flipped');
+  flipped = false;
+
+  const pct = (currentIndex / currentCards.length) * 100;
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${currentIndex} / ${currentCards.length}`;
+}
+
+function flipCard() {
+  flipped = !flipped;
+  document.getElementById('card-inner').classList.toggle('flipped', flipped);
+}
+
+function markCard(knew) {
+  results[currentCards[currentIndex].word] = knew;
+  currentIndex++;
+  showCard();
+}
+
+function prevCard() {
+  if (currentIndex > 0) { currentIndex--; showCard(); }
+}
+
+function shuffleDeck() {
+  for (let i = currentCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [currentCards[i], currentCards[j]] = [currentCards[j], currentCards[i]];
+  }
+  currentIndex = 0;
+  results = {};
+  showCard();
+}
+
+function showSummary() {
+  document.getElementById('study-area').style.display = 'none';
+  const box = document.getElementById('summary-box');
+  box.classList.add('show');
+
+  const total = currentCards.length;
+  const knew = Object.values(results).filter(Boolean).length;
+  const pct = total ? Math.round((knew / total) * 100) : 0;
+
+  document.getElementById('sum-pct').textContent = pct + '%';
+  document.getElementById('sum-sub').textContent = `You knew ${knew} of ${total} cards`;
+
+  const tags = Object.entries(results).map(([w, k]) =>
+    `<span class="known-tag ${k ? 'know' : 'skip'}">${w}</span>`
+  ).join('');
+  document.getElementById('sum-tags').innerHTML = tags;
+}
+
+function restartDeck() {
+  document.getElementById('summary-box').classList.remove('show');
+  document.getElementById('study-area').style.display = '';
+  startDeck(currentDeck.id);
+}
+
+function studyMissed() {
+  const missed = currentCards.filter(c => results[c.word] === false);
+  if (missed.length === 0) { alert('No missed cards! 🎉'); return; }
+  document.getElementById('summary-box').classList.remove('show');
+  document.getElementById('study-area').style.display = '';
+  startDeck(currentDeck.id, missed);
+}
+
+function backToDecks() {
+  document.getElementById('deck-grid').style.display = '';
+  document.getElementById('study-area').style.display = 'none';
+  document.getElementById('summary-box').classList.remove('show');
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (!currentDeck || document.getElementById('study-area').style.display === 'none') return;
+  if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); flipCard(); }
+  if (e.key === 'ArrowRight') markCard(true);
+  if (e.key === 'ArrowLeft') markCard(false);
+});
+
+buildDecks();
+</script>
+
+</body>
+</html>
