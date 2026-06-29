@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON Formatter, Validator & Converter | G9 Toolkit</title>
+  <meta name="description" content="Format, validate, minify, and convert JSON online. Also converts JSON to CSV and CSV to JSON. Runs entirely in your browser — no data sent to any server." />
+  <meta property="og:title" content="JSON Formatter & Converter | G9 Toolkit" />
+  <meta property="og:description" content="Free JSON formatter, validator, minifier, and CSV converter. 100% browser-based." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://g9toolkit.com/json-formatter/" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <style>
+    .tab-bar { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .tab-btn {
+      padding: 0.45rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px;
+      background: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      color: #64748b; transition: all 0.15s;
+    }
+    .tab-btn.active { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+    .editor-wrap { position: relative; }
+    textarea {
+      width: 100%; height: 280px; padding: 0.9rem; border: 1px solid #d1d5db;
+      border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85rem;
+      color: #1e293b; resize: vertical; background: #fafafa; line-height: 1.55;
+    }
+    textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    textarea.error { border-color: #ef4444; background: #fff5f5; }
+    textarea.success { border-color: #22c55e; }
+    .btn-row { display: flex; gap: 0.6rem; margin: 0.75rem 0; flex-wrap: wrap; }
+    .btn-sm {
+      padding: 0.5rem 1rem; border: 1px solid #e2e8f0; border-radius: 7px;
+      background: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      color: #475569; transition: all 0.15s;
+    }
+    .btn-sm:hover { background: #f1f5f9; color: #1e293b; }
+    .btn-sm.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .btn-sm.primary:hover { background: #1d4ed8; }
+    .btn-sm.danger { border-color: #fca5a5; color: #dc2626; }
+    .btn-sm.danger:hover { background: #fef2f2; }
+    .status-bar {
+      font-size: 0.8rem; padding: 0.4rem 0.75rem; border-radius: 6px;
+      margin-bottom: 0.5rem; display: none;
+    }
+    .status-bar.error { display: block; background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+    .status-bar.success { display: block; background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+    .status-bar.info { display: block; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .output-wrap { margin-top: 1rem; }
+    .output-label { font-size: 0.75rem; font-weight: 700; color: #64748b; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .stats-row { display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap; }
+    .stat-chip { font-size: 0.78rem; background: #f1f5f9; border-radius: 999px; padding: 0.25rem 0.65rem; color: #64748b; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+    <nav>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <div style="max-width:860px">
+    <h1 class="tool-title">JSON Formatter</h1>
+    <p class="tool-subtitle">Format, validate, minify JSON — and convert between JSON and CSV</p>
+
+    <div class="ad-slot ad-slot-banner"></div>
+
+    <div class="card">
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tab-fmt"  onclick="setTab('fmt')">Format / Validate</button>
+        <button class="tab-btn"        id="tab-mini" onclick="setTab('mini')">Minify</button>
+        <button class="tab-btn"        id="tab-j2c"  onclick="setTab('j2c')">JSON → CSV</button>
+        <button class="tab-btn"        id="tab-c2j"  onclick="setTab('c2j')">CSV → JSON</button>
+      </div>
+
+      <div id="pane-fmt">
+        <div class="status-bar" id="fmt-status"></div>
+        <div class="editor-wrap">
+          <textarea id="fmt-input" placeholder='Paste JSON here, e.g. {"name":"Alice","age":30}' oninput="fmtAuto()"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn-sm primary" onclick="formatJson()">Format</button>
+          <button class="btn-sm" onclick="validateOnly()">Validate</button>
+          <button class="btn-sm" onclick="copyOutput('fmt-output')">Copy output</button>
+          <button class="btn-sm danger" onclick="clearAll('fmt-input','fmt-output','fmt-status')">Clear</button>
+        </div>
+        <div class="output-wrap">
+          <div class="output-label">Output</div>
+          <textarea id="fmt-output" readonly placeholder="Formatted JSON will appear here…"></textarea>
+          <div class="stats-row" id="fmt-stats"></div>
+        </div>
+      </div>
+
+      <div id="pane-mini" style="display:none">
+        <div class="status-bar" id="mini-status"></div>
+        <textarea id="mini-input" placeholder="Paste JSON to minify…" oninput="minifyAuto()"></textarea>
+        <div class="btn-row">
+          <button class="btn-sm primary" onclick="minifyJson()">Minify</button>
+          <button class="btn-sm" onclick="copyOutput('mini-output')">Copy output</button>
+          <button class="btn-sm danger" onclick="clearAll('mini-input','mini-output','mini-status')">Clear</button>
+        </div>
+        <div class="output-wrap">
+          <div class="output-label">Output</div>
+          <textarea id="mini-output" readonly placeholder="Minified JSON will appear here…"></textarea>
+          <div class="stats-row" id="mini-stats"></div>
+        </div>
+      </div>
+
+      <div id="pane-j2c" style="display:none">
+        <div class="status-bar" id="j2c-status"></div>
+        <textarea id="j2c-input" placeholder='Paste a JSON array, e.g. [{"name":"Alice","age":30},{"name":"Bob","age":25}]'></textarea>
+        <div class="btn-row">
+          <button class="btn-sm primary" onclick="jsonToCsv()">Convert to CSV</button>
+          <button class="btn-sm" onclick="copyOutput('j2c-output')">Copy CSV</button>
+          <button class="btn-sm danger" onclick="clearAll('j2c-input','j2c-output','j2c-status')">Clear</button>
+        </div>
+        <div class="output-wrap">
+          <div class="output-label">CSV output</div>
+          <textarea id="j2c-output" readonly placeholder="CSV will appear here…"></textarea>
+        </div>
+      </div>
+
+      <div id="pane-c2j" style="display:none">
+        <div class="status-bar" id="c2j-status"></div>
+        <textarea id="c2j-input" placeholder="Paste CSV here (first row = headers)…"></textarea>
+        <div class="btn-row">
+          <button class="btn-sm primary" onclick="csvToJson()">Convert to JSON</button>
+          <button class="btn-sm" onclick="copyOutput('c2j-output')">Copy JSON</button>
+          <button class="btn-sm danger" onclick="clearAll('c2j-input','c2j-output','c2j-status')">Clear</button>
+        </div>
+        <div class="output-wrap">
+          <div class="output-label">JSON output</div>
+          <textarea id="c2j-output" readonly placeholder="JSON will appear here…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card prose">
+      <h2>What is JSON?</h2>
+      <p>JSON (JavaScript Object Notation) is a lightweight, human-readable format for storing and transporting data. It is based on JavaScript object syntax but is language-independent. JSON supports six data types: strings, numbers, booleans, arrays, objects, and null.</p>
+
+      <h2>Common JSON errors</h2>
+      <p><strong>Trailing commas</strong> — JSON does not allow a comma after the last item in an array or object. <code>[1, 2, 3,]</code> is invalid. <strong>Single quotes</strong> — JSON requires double quotes for strings and keys. <strong>Unquoted keys</strong> — unlike JavaScript objects, JSON keys must always be quoted. <strong>Comments</strong> — JSON does not support comments of any kind.</p>
+
+      <h2>JSON vs CSV</h2>
+      <p>JSON excels at representing nested, hierarchical data — records with mixed types, optional fields, and nested objects or arrays. CSV is simpler and more compact for flat tabular data — spreadsheet exports, data pipelines, and records with uniform fields. Use our converter above to switch between the two formats.</p>
+
+      <h2>Formatting vs minifying</h2>
+      <p>Formatted (pretty-printed) JSON adds indentation and line breaks to make it human-readable. Minified JSON removes all unnecessary whitespace to reduce file size. Minified JSON is faster to transmit over a network and is the default for API responses; formatted JSON is better for configuration files, logging, and debugging.</p>
+    </div>
+
+    <div class="ad-slot ad-slot-bottom"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+      <p>Free online tools that run in your browser. No account needed.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Tools</h4>
+      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/bmi/">BMI Calculator</a>
+      <a href="/world-clock/">World Clock</a>
+      <a href="/json-formatter/">JSON Formatter</a>
+      <a href="/zip/">ZIP / Unzip</a>
+    </div>
+    <div class="footer-links">
+      <h4>Company</h4>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved.</div>
+</footer>
+
+<script>
+  let activeTab = 'fmt';
+
+  function setTab(tab) {
+    activeTab = tab;
+    ['fmt','mini','j2c','c2j'].forEach(t => {
+      document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+      document.getElementById('pane-' + t).style.display = t === tab ? '' : 'none';
+    });
+  }
+
+  function setStatus(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'status-bar ' + type;
+  }
+
+  function clearStatus(id) {
+    const el = document.getElementById(id);
+    el.className = 'status-bar';
+  }
+
+  function setStats(id, input, output) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const keys = output ? Object.keys(tryParse(output) || {}).length : 0;
+    el.innerHTML = `<span class="stat-chip">${input.length.toLocaleString()} chars in</span>` +
+      (output ? `<span class="stat-chip">${output.length.toLocaleString()} chars out</span>` : '');
+  }
+
+  function tryParse(str) {
+    try { return JSON.parse(str); } catch { return null; }
+  }
+
+  function formatJson() {
+    const input = document.getElementById('fmt-input').value.trim();
+    if (!input) return;
+    try {
+      const parsed = JSON.parse(input);
+      const out = JSON.stringify(parsed, null, 2);
+      document.getElementById('fmt-output').value = out;
+      document.getElementById('fmt-input').className = '';
+      document.getElementById('fmt-output').className = 'success';
+      setStatus('fmt-status', '✓ Valid JSON — formatted successfully', 'success');
+      setStats('fmt-stats', input, out);
+    } catch (e) {
+      document.getElementById('fmt-input').className = 'error';
+      setStatus('fmt-status', '✗ Invalid JSON: ' + e.message, 'error');
+    }
+  }
+
+  function validateOnly() {
+    const input = document.getElementById('fmt-input').value.trim();
+    if (!input) return;
+    try {
+      JSON.parse(input);
+      document.getElementById('fmt-input').className = 'success';
+      setStatus('fmt-status', '✓ Valid JSON', 'success');
+    } catch (e) {
+      document.getElementById('fmt-input').className = 'error';
+      setStatus('fmt-status', '✗ Invalid: ' + e.message, 'error');
+    }
+  }
+
+  function fmtAuto() {
+    clearStatus('fmt-status');
+    document.getElementById('fmt-input').className = '';
+  }
+
+  function minifyJson() {
+    const input = document.getElementById('mini-input').value.trim();
+    if (!input) return;
+    try {
+      const out = JSON.stringify(JSON.parse(input));
+      document.getElementById('mini-output').value = out;
+      setStatus('mini-status', '✓ Minified successfully', 'success');
+      setStats('mini-stats', input, out);
+    } catch (e) {
+      setStatus('mini-status', '✗ Invalid JSON: ' + e.message, 'error');
+    }
+  }
+
+  function minifyAuto() { clearStatus('mini-status'); }
+
+  function jsonToCsv() {
+    const input = document.getElementById('j2c-input').value.trim();
+    try {
+      const data = JSON.parse(input);
+      if (!Array.isArray(data) || data.length === 0) throw new Error('Input must be a non-empty JSON array');
+      const keys = Object.keys(data[0]);
+      const escape = v => {
+        const s = (v == null ? '' : String(v));
+        return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      };
+      const rows = [keys.join(','), ...data.map(row => keys.map(k => escape(row[k])).join(','))];
+      document.getElementById('j2c-output').value = rows.join('\n');
+      setStatus('j2c-status', `✓ Converted ${data.length} row(s)`, 'success');
+    } catch (e) {
+      setStatus('j2c-status', '✗ ' + e.message, 'error');
+    }
+  }
+
+  function csvToJson() {
+    const input = document.getElementById('c2j-input').value.trim();
+    try {
+      const lines = input.split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) throw new Error('Need at least a header row and one data row');
+      const parseRow = line => {
+        const cols = []; let cur = ''; let inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"' && !inQ) { inQ = true; continue; }
+          if (ch === '"' && inQ && line[i+1] === '"') { cur += '"'; i++; continue; }
+          if (ch === '"' && inQ) { inQ = false; continue; }
+          if (ch === ',' && !inQ) { cols.push(cur); cur = ''; continue; }
+          cur += ch;
+        }
+        cols.push(cur);
+        return cols;
+      };
+      const headers = parseRow(lines[0]);
+      const result = lines.slice(1).map(line => {
+        const vals = parseRow(line);
+        const obj = {};
+        headers.forEach((h, i) => { obj[h] = vals[i] !== undefined ? vals[i] : ''; });
+        return obj;
+      });
+      document.getElementById('c2j-output').value = JSON.stringify(result, null, 2);
+      setStatus('c2j-status', `✓ Converted ${result.length} row(s)`, 'success');
+    } catch (e) {
+      setStatus('c2j-status', '✗ ' + e.message, 'error');
+    }
+  }
+
+  function copyOutput(id) {
+    const val = document.getElementById(id).value;
+    if (!val) return;
+    navigator.clipboard.writeText(val).then(() => {
+      const btn = event.target;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = btn.textContent.replace('Copied!', 'Copy output').replace('Copied!', 'Copy CSV').replace('Copied!', 'Copy JSON') || 'Copy', 1500);
+    });
+  }
+
+  function clearAll(inputId, outputId, statusId) {
+    document.getElementById(inputId).value = '';
+    document.getElementById(outputId).value = '';
+    document.getElementById(inputId).className = '';
+    document.getElementById(outputId).className = '';
+    clearStatus(statusId);
+    const stats = document.getElementById(inputId.replace('input','stats'));
+    if (stats) stats.innerHTML = '';
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Clock — Current Time in Every Time Zone | G9 Toolkit</title>
+  <meta name="description" content="Check the current time in cities around the world. Compare time zones, convert times, and see which cities are currently in business hours." />
+  <meta property="og:title" content="World Clock | G9 Toolkit" />
+  <meta property="og:description" content="Live world clock with time zone converter. No signup required." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://g9toolkit.com/world-clock/" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <style>
+    .clock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .clock-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.25rem 1.25rem 1rem;
+      position: relative;
+    }
+    .clock-card.pinned { border-color: #2563eb; }
+    .clock-card.business { background: #f0fdf4; border-color: #86efac; }
+    .clock-city { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
+    .clock-country { font-size: 0.78rem; color: #94a3b8; margin-bottom: 0.5rem; }
+    .clock-time { font-size: 1.8rem; font-weight: 800; color: #1e293b; line-height: 1; letter-spacing: -0.02em; }
+    .clock-date { font-size: 0.8rem; color: #64748b; margin-top: 0.2rem; }
+    .clock-offset { font-size: 0.75rem; color: #94a3b8; margin-top: 0.4rem; }
+    .biz-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      margin-right: 4px;
+    }
+    .biz-dot.open { background: #22c55e; }
+    .biz-dot.closed { background: #94a3b8; }
+    .pin-btn {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      background: none; border: none; cursor: pointer; font-size: 1rem;
+      color: #94a3b8; padding: 0; line-height: 1;
+    }
+    .pin-btn.pinned { color: #2563eb; }
+    .converter-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .converter-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+    .converter-row input[type=time], .converter-row select {
+      padding: 0.6rem 0.8rem; border: 1px solid #d1d5db; border-radius: 8px;
+      font-size: 0.95rem; color: #1e293b; background: #fff;
+    }
+    .converter-row input[type=time]:focus, .converter-row select:focus {
+      outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .conv-result {
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px;
+      padding: 1rem 1.25rem; margin-top: 1rem; font-size: 0.95rem; color: #1e293b;
+      display: none;
+    }
+    .conv-result.show { display: block; }
+    .conv-result strong { color: #2563eb; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; color: #64748b;
+      letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.75rem;
+    }
+    .your-time {
+      font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem;
+    }
+    .search-input {
+      width: 100%; padding: 0.65rem 1rem; border: 1px solid #d1d5db;
+      border-radius: 8px; font-size: 0.95rem; margin-bottom: 1.25rem;
+    }
+    .search-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+    <nav>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="tool-title" style="margin-bottom:0.35rem;">World Clock</h1>
+  <p class="tool-subtitle">Current time in major cities worldwide — updates every second</p>
+
+  <div class="your-time" id="your-time"></div>
+
+  <div class="ad-slot ad-slot-banner"></div>
+
+  <div class="converter-card">
+    <div class="section-label">Time zone converter</div>
+    <div class="converter-row">
+      <input type="time" id="conv-time" oninput="convertTime()" />
+      <select id="conv-from" onchange="convertTime()"></select>
+      <span style="color:#64748b;font-weight:600;">→</span>
+      <select id="conv-to" onchange="convertTime()"></select>
+    </div>
+    <div class="conv-result" id="conv-result"></div>
+  </div>
+
+  <input class="search-input" type="text" placeholder="Search city or time zone..." id="search-input" oninput="filterClocks()" />
+
+  <div class="section-label">All cities</div>
+  <div class="clock-grid" id="clock-grid"></div>
+
+  <div class="card prose" style="margin-top:1rem;">
+    <h2>What is UTC?</h2>
+    <p>Coordinated Universal Time (UTC) is the primary time standard by which the world regulates clocks. It is the successor to Greenwich Mean Time (GMT) and does not observe Daylight Saving Time. All time zones are defined as offsets from UTC — for example, New York is UTC−5 in winter (EST) and UTC−4 in summer (EDT).</p>
+
+    <h2>Daylight Saving Time</h2>
+    <p>Daylight Saving Time (DST) advances clocks by one hour during summer months to extend evening daylight. Not all countries observe DST — China, Japan, India, and most of Africa do not. In North America, DST begins the second Sunday in March and ends the first Sunday in November. In Europe, it begins the last Sunday in March and ends the last Sunday in October.</p>
+
+    <h2>Time zones and international business</h2>
+    <p>When scheduling international meetings, aim for overlapping business hours (roughly 9 AM – 6 PM local time). A meeting that works for New York (EST, UTC−5) at 9 AM is 2 PM in London (GMT, UTC+0) and 10 PM in Tokyo (JST, UTC+9) — often too late for Japanese colleagues. Tools like this world clock help you find times that work for everyone.</p>
+  </div>
+
+  <div class="ad-slot ad-slot-bottom"></div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+      <p>Free online tools that run in your browser. No account needed.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Tools</h4>
+      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/bmi/">BMI Calculator</a>
+      <a href="/world-clock/">World Clock</a>
+      <a href="/json-formatter/">JSON Formatter</a>
+      <a href="/zip/">ZIP / Unzip</a>
+    </div>
+    <div class="footer-links">
+      <h4>Company</h4>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved.</div>
+</footer>
+
+<script>
+  const CITIES = [
+    { city:'New York',       country:'United States', tz:'America/New_York' },
+    { city:'Los Angeles',    country:'United States', tz:'America/Los_Angeles' },
+    { city:'Chicago',        country:'United States', tz:'America/Chicago' },
+    { city:'Toronto',        country:'Canada',        tz:'America/Toronto' },
+    { city:'Vancouver',      country:'Canada',        tz:'America/Vancouver' },
+    { city:'London',         country:'United Kingdom',tz:'Europe/London' },
+    { city:'Paris',          country:'France',        tz:'Europe/Paris' },
+    { city:'Berlin',         country:'Germany',       tz:'Europe/Berlin' },
+    { city:'Madrid',         country:'Spain',         tz:'Europe/Madrid' },
+    { city:'Rome',           country:'Italy',         tz:'Europe/Rome' },
+    { city:'Amsterdam',      country:'Netherlands',   tz:'Europe/Amsterdam' },
+    { city:'Stockholm',      country:'Sweden',        tz:'Europe/Stockholm' },
+    { city:'Moscow',         country:'Russia',        tz:'Europe/Moscow' },
+    { city:'Dubai',          country:'UAE',           tz:'Asia/Dubai' },
+    { city:'Istanbul',       country:'Turkey',        tz:'Europe/Istanbul' },
+    { city:'Riyadh',         country:'Saudi Arabia',  tz:'Asia/Riyadh' },
+    { city:'Mumbai',         country:'India',         tz:'Asia/Kolkata' },
+    { city:'Kolkata',        country:'India',         tz:'Asia/Kolkata' },
+    { city:'Bangkok',        country:'Thailand',      tz:'Asia/Bangkok' },
+    { city:'Singapore',      country:'Singapore',     tz:'Asia/Singapore' },
+    { city:'Kuala Lumpur',   country:'Malaysia',      tz:'Asia/Kuala_Lumpur' },
+    { city:'Hong Kong',      country:'China',         tz:'Asia/Hong_Kong' },
+    { city:'Shanghai',       country:'China',         tz:'Asia/Shanghai' },
+    { city:'Beijing',        country:'China',         tz:'Asia/Shanghai' },
+    { city:'Seoul',          country:'South Korea',   tz:'Asia/Seoul' },
+    { city:'Tokyo',          country:'Japan',         tz:'Asia/Tokyo' },
+    { city:'Sydney',         country:'Australia',     tz:'Australia/Sydney' },
+    { city:'Melbourne',      country:'Australia',     tz:'Australia/Melbourne' },
+    { city:'Auckland',       country:'New Zealand',   tz:'Pacific/Auckland' },
+    { city:'São Paulo',      country:'Brazil',        tz:'America/Sao_Paulo' },
+    { city:'Buenos Aires',   country:'Argentina',     tz:'America/Argentina/Buenos_Aires' },
+    { city:'Mexico City',    country:'Mexico',        tz:'America/Mexico_City' },
+    { city:'Cairo',          country:'Egypt',         tz:'Africa/Cairo' },
+    { city:'Lagos',          country:'Nigeria',       tz:'Africa/Lagos' },
+    { city:'Johannesburg',   country:'South Africa',  tz:'Africa/Johannesburg' },
+    { city:'Nairobi',        country:'Kenya',         tz:'Africa/Nairobi' },
+  ];
+
+  let pinned = new Set(JSON.parse(localStorage.getItem('wc-pinned') || '[]'));
+  let filter = '';
+
+  function getOffset(tz) {
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const local = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+    const diff = (local - new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }))) / 60000;
+    const h = Math.floor(Math.abs(diff) / 60);
+    const m = Math.abs(diff) % 60;
+    const sign = diff >= 0 ? '+' : '-';
+    return `UTC${sign}${h}${m ? ':' + String(m).padStart(2,'0') : ''}`;
+  }
+
+  function isBusinessHours(tz) {
+    const h = parseInt(new Date().toLocaleString('en-US', { timeZone: tz, hour: 'numeric', hour12: false }));
+    return h >= 9 && h < 18;
+  }
+
+  function renderClocks() {
+    const grid = document.getElementById('clock-grid');
+    const q = filter.toLowerCase();
+    const visible = CITIES.filter(c =>
+      !q || c.city.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tz.toLowerCase().includes(q)
+    );
+
+    const sorted = [...visible].sort((a, b) => {
+      const ap = pinned.has(a.city) ? 0 : 1;
+      const bp = pinned.has(b.city) ? 0 : 1;
+      return ap - bp;
+    });
+
+    grid.innerHTML = sorted.map(c => {
+      const now = new Date();
+      const timeStr = now.toLocaleString('en-US', { timeZone: c.tz, hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+      const dateStr = now.toLocaleString('en-US', { timeZone: c.tz, weekday: 'short', month: 'short', day: 'numeric' });
+      const offset = getOffset(c.tz);
+      const biz = isBusinessHours(c.tz);
+      const isPinned = pinned.has(c.city);
+      return `<div class="clock-card${isPinned ? ' pinned' : ''}${biz ? ' business' : ''}">
+        <button class="pin-btn${isPinned ? ' pinned' : ''}" onclick="togglePin('${c.city}')" title="${isPinned ? 'Unpin' : 'Pin'}">
+          ${isPinned ? '📌' : '📍'}
+        </button>
+        <div class="clock-city">${c.city}</div>
+        <div class="clock-country">${c.country}</div>
+        <div class="clock-time">${timeStr}</div>
+        <div class="clock-date">${dateStr}</div>
+        <div class="clock-offset">
+          <span class="biz-dot ${biz ? 'open' : 'closed'}"></span>${offset} · ${biz ? 'Business hours' : 'Outside hours'}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function updateYourTime() {
+    const now = new Date();
+    const t = now.toLocaleString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'numeric', minute:'2-digit', second:'2-digit', hour12:true });
+    document.getElementById('your-time').textContent = 'Your local time: ' + t;
+  }
+
+  function togglePin(city) {
+    if (pinned.has(city)) pinned.delete(city); else pinned.add(city);
+    localStorage.setItem('wc-pinned', JSON.stringify([...pinned]));
+    renderClocks();
+  }
+
+  function filterClocks() {
+    filter = document.getElementById('search-input').value;
+    renderClocks();
+  }
+
+  function populateConverterSelects() {
+    const tzList = [...new Set(CITIES.map(c => c.tz))];
+    const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    ['conv-from','conv-to'].forEach((id, i) => {
+      const sel = document.getElementById(id);
+      tzList.forEach(tz => {
+        const opt = document.createElement('option');
+        opt.value = tz;
+        opt.textContent = tz.replace('_',' ');
+        if (i === 0 && tz === userTz) opt.selected = true;
+        if (i === 1 && tz === 'Asia/Tokyo') opt.selected = true;
+        sel.appendChild(opt);
+      });
+    });
+  }
+
+  function convertTime() {
+    const timeVal = document.getElementById('conv-time').value;
+    const fromTz  = document.getElementById('conv-from').value;
+    const toTz    = document.getElementById('conv-to').value;
+    const res     = document.getElementById('conv-result');
+    if (!timeVal) { res.classList.remove('show'); return; }
+
+    const [h, m] = timeVal.split(':').map(Number);
+    const today = new Date();
+    today.setHours(h, m, 0, 0);
+
+    const fromStr = today.toLocaleString('en-US', { timeZone: fromTz, hour:'numeric', minute:'2-digit', hour12:true });
+    const toStr   = today.toLocaleString('en-US', { timeZone: toTz,   hour:'numeric', minute:'2-digit', hour12:true });
+    const toDate  = today.toLocaleString('en-US', { timeZone: toTz,   weekday:'short', month:'short', day:'numeric' });
+
+    res.innerHTML = `<strong>${fromStr}</strong> in ${fromTz.split('/').pop().replace('_',' ')} = <strong>${toStr}</strong> on ${toDate} in ${toTz.split('/').pop().replace('_',' ')}`;
+    res.classList.add('show');
+  }
+
+  populateConverterSelects();
+  renderClocks();
+  updateYourTime();
+  setInterval(() => { renderClocks(); updateYourTime(); }, 1000);
+</script>
+
+</body>
+</html>

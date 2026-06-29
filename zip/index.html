@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZIP & Unzip Files Online — Free Browser Tool | G9 Toolkit</title>
+  <meta name="description" content="Create ZIP archives or extract ZIP files directly in your browser. No upload to any server — all processing happens locally on your device. Fast and private." />
+  <meta property="og:title" content="ZIP / Unzip Files Online | G9 Toolkit" />
+  <meta property="og:description" content="Free browser-based ZIP and unzip tool. Files never leave your device." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://g9toolkit.com/zip/" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2/dist/FileSaver.min.js"></script>
+  <style>
+    .tool-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .tool-tab {
+      flex: 1; padding: 0.65rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px;
+      background: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      color: #64748b; transition: all 0.15s; text-align: center;
+    }
+    .tool-tab.active { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+    .drop-zone {
+      border: 2px dashed #d1d5db; border-radius: 12px; padding: 3rem 2rem;
+      text-align: center; cursor: pointer; transition: all 0.2s; background: #fafafa;
+    }
+    .drop-zone:hover, .drop-zone.over { border-color: #2563eb; background: #eff6ff; }
+    .drop-zone .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .drop-zone p { color: #64748b; font-size: 0.9rem; }
+    .drop-zone strong { color: #2563eb; }
+    .file-input { display: none; }
+    .file-list { margin-top: 1.25rem; }
+    .file-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.6rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;
+      margin-bottom: 0.5rem; background: #fff; font-size: 0.875rem;
+    }
+    .file-row .file-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .file-row .file-name { flex: 1; color: #1e293b; font-weight: 500; word-break: break-all; }
+    .file-row .file-size { color: #94a3b8; font-size: 0.78rem; white-space: nowrap; }
+    .file-row .remove-btn {
+      background: none; border: none; cursor: pointer; color: #94a3b8;
+      font-size: 1.1rem; padding: 0; line-height: 1; flex-shrink: 0;
+    }
+    .file-row .remove-btn:hover { color: #ef4444; }
+    .zip-name-row { display: flex; gap: 0.75rem; align-items: center; margin: 1rem 0; }
+    .zip-name-row input {
+      flex: 1; padding: 0.6rem 0.9rem; border: 1px solid #d1d5db;
+      border-radius: 8px; font-size: 0.9rem; color: #1e293b;
+    }
+    .zip-name-row input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .progress-bar-wrap { background: #e2e8f0; border-radius: 999px; height: 8px; margin: 1rem 0; display: none; }
+    .progress-bar { background: #2563eb; height: 8px; border-radius: 999px; transition: width 0.2s; width: 0%; }
+    .unzip-list { margin-top: 1.25rem; }
+    .unzip-file {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;
+      margin-bottom: 0.4rem; background: #fff; font-size: 0.85rem;
+    }
+    .unzip-file .dl-btn {
+      margin-left: auto; padding: 0.3rem 0.7rem; border: 1px solid #2563eb;
+      border-radius: 6px; background: #fff; color: #2563eb; font-size: 0.78rem;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .unzip-file .dl-btn:hover { background: #eff6ff; }
+    .summary-badge {
+      display: inline-block; background: #f0fdf4; border: 1px solid #86efac;
+      color: #16a34a; border-radius: 8px; padding: 0.5rem 1rem;
+      font-size: 0.85rem; font-weight: 600; margin-top: 0.75rem;
+    }
+    .privacy-note {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+      padding: 0.6rem 0.9rem; font-size: 0.8rem; color: #64748b; margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+    <nav>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <div style="max-width:760px">
+    <h1 class="tool-title">ZIP / Unzip Files</h1>
+    <p class="tool-subtitle">Compress or extract files directly in your browser — nothing is uploaded anywhere</p>
+
+    <div class="ad-slot ad-slot-banner"></div>
+
+    <div class="card">
+      <div class="tool-tabs">
+        <button class="tool-tab active" id="tab-zip"   onclick="setMode('zip')">📦 Create ZIP</button>
+        <button class="tool-tab"        id="tab-unzip" onclick="setMode('unzip')">📂 Extract ZIP</button>
+      </div>
+
+      <!-- ZIP pane -->
+      <div id="pane-zip">
+        <div class="drop-zone" id="zip-drop" onclick="document.getElementById('zip-file-input').click()"
+             ondragover="dragOver(event,'zip-drop')" ondragleave="dragLeave('zip-drop')" ondrop="dropFiles(event)">
+          <div class="icon">📁</div>
+          <p>Drag & drop files here, or <strong>click to browse</strong></p>
+          <p style="font-size:0.78rem;margin-top:0.3rem;color:#94a3b8">Any file type — multiple files supported</p>
+        </div>
+        <input type="file" id="zip-file-input" class="file-input" multiple onchange="addFiles(this.files)" />
+
+        <div class="file-list" id="zip-file-list"></div>
+
+        <div class="zip-name-row" id="zip-name-row" style="display:none">
+          <input type="text" id="zip-name" placeholder="archive.zip" value="archive.zip" />
+        </div>
+
+        <div class="progress-bar-wrap" id="zip-progress-wrap">
+          <div class="progress-bar" id="zip-progress-bar"></div>
+        </div>
+
+        <button class="btn" id="zip-btn" onclick="createZip()" style="display:none;margin-top:0.5rem;">Create ZIP</button>
+
+        <div class="privacy-note">🔒 Files are processed entirely in your browser. Nothing is uploaded to any server.</div>
+      </div>
+
+      <!-- Unzip pane -->
+      <div id="pane-unzip" style="display:none">
+        <div class="drop-zone" id="unzip-drop" onclick="document.getElementById('unzip-file-input').click()"
+             ondragover="dragOver(event,'unzip-drop')" ondragleave="dragLeave('unzip-drop')" ondrop="dropZip(event)">
+          <div class="icon">🗜️</div>
+          <p>Drag & drop a <strong>.zip file</strong> here, or <strong>click to browse</strong></p>
+        </div>
+        <input type="file" id="unzip-file-input" class="file-input" accept=".zip" onchange="loadZip(this.files[0])" />
+
+        <div class="unzip-list" id="unzip-list"></div>
+
+        <div class="privacy-note">🔒 Files are processed entirely in your browser. Nothing is uploaded to any server.</div>
+      </div>
+    </div>
+
+    <div class="card prose">
+      <h2>What is a ZIP file?</h2>
+      <p>ZIP is a file format that supports lossless data compression and can bundle multiple files and folders into a single archive. Developed by Phil Katz in 1989, it is one of the most universally supported compression formats. ZIP files use the .zip extension and are natively supported on Windows, macOS, Linux, iOS, and Android without any additional software.</p>
+
+      <h2>Is it safe to use this tool?</h2>
+      <p>Yes. This tool runs entirely in your browser using the <a href="https://stuk.github.io/jszip/" rel="noopener noreferrer" target="_blank">JSZip</a> library. Your files are never sent to any server — all compression and extraction happens locally on your device. Once you close or navigate away from this page, no trace of your files remains.</p>
+
+      <h2>ZIP vs other formats (RAR, 7-Zip, gzip)</h2>
+      <p>ZIP offers the best compatibility — every operating system supports it natively. RAR provides better compression ratios but requires WinRAR or 7-Zip to open. 7-Zip's .7z format offers the highest compression but is less universally supported. gzip (.gz) is common on Linux/macOS for compressing single files. For most everyday use cases — sharing files by email, organizing downloads — ZIP is the right choice.</p>
+    </div>
+
+    <div class="ad-slot ad-slot-bottom"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+      <p>Free online tools that run in your browser. No account needed.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Tools</h4>
+      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/bmi/">BMI Calculator</a>
+      <a href="/world-clock/">World Clock</a>
+      <a href="/json-formatter/">JSON Formatter</a>
+      <a href="/zip/">ZIP / Unzip</a>
+    </div>
+    <div class="footer-links">
+      <h4>Company</h4>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved.</div>
+</footer>
+
+<script>
+  let zipFiles = [];
+  let mode = 'zip';
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById('tab-zip').classList.toggle('active', m === 'zip');
+    document.getElementById('tab-unzip').classList.toggle('active', m === 'unzip');
+    document.getElementById('pane-zip').style.display = m === 'zip' ? '' : 'none';
+    document.getElementById('pane-unzip').style.display = m === 'unzip' ? '' : 'none';
+  }
+
+  function dragOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('over'); }
+  function dragLeave(id) { document.getElementById(id).classList.remove('over'); }
+
+  function dropFiles(e) {
+    e.preventDefault();
+    dragLeave('zip-drop');
+    addFiles(e.dataTransfer.files);
+  }
+
+  function dropZip(e) {
+    e.preventDefault();
+    dragLeave('unzip-drop');
+    const f = e.dataTransfer.files[0];
+    if (f) loadZip(f);
+  }
+
+  function fmtSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  function fileIcon(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    const map = { jpg:'🖼️', jpeg:'🖼️', png:'🖼️', gif:'🖼️', webp:'🖼️', svg:'🖼️',
+                  pdf:'📄', doc:'📝', docx:'📝', xls:'📊', xlsx:'📊',
+                  mp4:'🎬', mp3:'🎵', zip:'🗜️', txt:'📃', js:'📜', ts:'📜',
+                  html:'🌐', css:'🎨', json:'🔧', py:'🐍', rb:'💎', go:'🔵' };
+    return map[ext] || '📄';
+  }
+
+  function addFiles(fileList) {
+    for (const f of fileList) {
+      if (!zipFiles.find(z => z.name === f.name && z.size === f.size)) {
+        zipFiles.push(f);
+      }
+    }
+    renderFileList();
+  }
+
+  function removeFile(idx) {
+    zipFiles.splice(idx, 1);
+    renderFileList();
+  }
+
+  function renderFileList() {
+    const list = document.getElementById('zip-file-list');
+    const nameRow = document.getElementById('zip-name-row');
+    const btn = document.getElementById('zip-btn');
+
+    if (zipFiles.length === 0) {
+      list.innerHTML = '';
+      nameRow.style.display = 'none';
+      btn.style.display = 'none';
+      return;
+    }
+
+    list.innerHTML = zipFiles.map((f, i) =>
+      `<div class="file-row">
+        <span class="file-icon">${fileIcon(f.name)}</span>
+        <span class="file-name">${f.name}</span>
+        <span class="file-size">${fmtSize(f.size)}</span>
+        <button class="remove-btn" onclick="removeFile(${i})">✕</button>
+      </div>`
+    ).join('');
+
+    nameRow.style.display = 'flex';
+    btn.style.display = 'block';
+  }
+
+  async function createZip() {
+    if (zipFiles.length === 0) return;
+    const btn = document.getElementById('zip-btn');
+    const pw = document.getElementById('zip-progress-wrap');
+    const pb = document.getElementById('zip-progress-bar');
+    btn.disabled = true;
+    btn.textContent = 'Creating…';
+    pw.style.display = 'block';
+    pb.style.width = '0%';
+
+    const zip = new JSZip();
+    zipFiles.forEach(f => zip.file(f.name, f));
+
+    const content = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' }, meta => {
+      pb.style.width = meta.percent.toFixed(0) + '%';
+    });
+
+    const name = (document.getElementById('zip-name').value.trim() || 'archive') + (document.getElementById('zip-name').value.endsWith('.zip') ? '' : '.zip');
+    saveAs(content, name);
+
+    btn.disabled = false;
+    btn.textContent = '✓ Downloaded — Create another ZIP';
+    pb.style.width = '100%';
+    setTimeout(() => { pw.style.display = 'none'; btn.textContent = 'Create ZIP'; }, 2000);
+  }
+
+  async function loadZip(file) {
+    if (!file) return;
+    const list = document.getElementById('unzip-list');
+    list.innerHTML = '<p style="color:#64748b;font-size:0.9rem;padding:1rem 0">Loading…</p>';
+
+    try {
+      const zip = await JSZip.loadAsync(file);
+      const entries = Object.values(zip.files).filter(f => !f.dir);
+
+      if (entries.length === 0) {
+        list.innerHTML = '<p style="color:#64748b;font-size:0.9rem">No files found in this ZIP.</p>';
+        return;
+      }
+
+      list.innerHTML = `<div class="summary-badge">📦 ${file.name} — ${entries.length} file(s)</div>` +
+        entries.map((f, i) =>
+          `<div class="unzip-file">
+            <span>${fileIcon(f.name)}</span>
+            <span style="flex:1;word-break:break-all;font-size:0.85rem">${f.name}</span>
+            <button class="dl-btn" onclick="downloadEntry('${f.name}')">Download</button>
+          </div>`
+        ).join('') +
+        `<button class="btn" onclick="downloadAll()" style="margin-top:1rem;">Download all files</button>`;
+
+      window._zip = zip;
+      window._zipFile = file;
+    } catch (e) {
+      list.innerHTML = `<p style="color:#dc2626;font-size:0.9rem">Error: ${e.message}</p>`;
+    }
+  }
+
+  async function downloadEntry(name) {
+    const f = window._zip.file(name);
+    if (!f) return;
+    const blob = await f.async('blob');
+    saveAs(blob, name.split('/').pop());
+  }
+
+  async function downloadAll() {
+    if (!window._zip || !window._zipFile) return;
+    saveAs(window._zipFile, window._zipFile.name);
+  }
+</script>
+
+</body>
+</html>
