@@ -1,1 +1,2 @@
-# No homepage redirect — let index.html serve as content for Google
+# Redirect old /mortgage/ URL to homepage (calculator is now on homepage)
+/mortgage/   /   301

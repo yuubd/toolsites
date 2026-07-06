@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>G9 Toolkit — Free Online Calculators and Tools</title>
-  <meta name="description" content="Free online calculators and tools that run entirely in your browser. No login, no signup. Mortgage calculator, loan calculator, and more." />
-  <meta property="og:title" content="G9 Toolkit — Free Online Calculators and Tools" />
-  <meta property="og:description" content="Free, fast, browser-based tools. No login required." />
+  <title>Free Mortgage Calculator — Canada & US | G9 Toolkit</title>
+  <meta name="description" content="Free mortgage calculator for Canada and the US. Supports Canadian semi-annual compounding, CMHC insurance, and stress test. Instantly see your monthly payment, total interest, and amortization schedule." />
+  <meta property="og:title" content="Free Mortgage Calculator — Canada & US | G9 Toolkit" />
+  <meta property="og:description" content="Calculate your mortgage payment for Canada (with CMHC & stress test) or the US. Free, no login required." />
   <meta property="og:type" content="website" />
   <link rel="canonical" href="https://g9toolkit.com/" />
   <link rel="stylesheet" href="/css/style.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "G9 Toolkit",
-    "url": "https://g9toolkit.com",
-    "description": "Free online calculators and tools for finance, math, and everyday use."
+    "@type": "WebApplication",
+    "name": "Mortgage Calculator — Canada & US",
+    "description": "Free online mortgage calculator for Canada and the United States. Calculates monthly payment, CMHC insurance, stress test, and full amortization schedule.",
+    "url": "https://g9toolkit.com/",
+    "applicationCategory": "FinanceApplication",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
   </script>
 </head>
@@ -25,115 +28,301 @@
 
 <header>
   <div class="header-inner">
+    <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
     <nav>
-      <a href="/">Home</a>
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
     </nav>
   </div>
 </header>
 
-<section class="hero">
-  <h1>Free Online Tools for Everyone</h1>
-  <p>Fast, accurate, browser-based calculators. No login. No signup. No hassle.</p>
-</section>
+<div class="page-header">
+  <div style="max-width:1100px; margin:0 auto; padding:0 1.5rem;">
+    <h1>Mortgage Calculator</h1>
+    <p>Calculate your monthly payment, total interest, and full amortization schedule — Canada &amp; US.</p>
+  </div>
+</div>
 
 <div class="container">
-
   <div class="ad-slot ad-slot-banner"></div>
 
-  <h2 style="font-size:1.1rem;font-weight:700;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:1rem;">Finance Tools</h2>
-  <div class="tool-grid">
-    <a href="/mortgage/" class="tool-card">
-      <div class="icon">🏠</div>
-      <span class="badge">Finance</span>
-      <h3>Mortgage Calculator</h3>
-      <p>Calculate your monthly mortgage payment, total interest, and view a full amortization schedule. Supports Canada (CMHC, stress test) and the United States.</p>
-    </a>
-  </div>
+  <div class="layout">
+    <!-- Main tool -->
+    <div>
+      <div class="card">
+        <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;">
+          <button id="btnCA" onclick="setCountry('CA')" class="btn" style="flex:1;padding:0.6rem;">🇨🇦 Canada</button>
+          <button id="btnUS" onclick="setCountry('US')" class="btn" style="flex:1;padding:0.6rem;background:#e2e8f0;color:#1e293b;">🇺🇸 United States</button>
+        </div>
 
-  <h2 style="font-size:1.1rem;font-weight:700;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;margin:2rem 0 1rem;">Health Tools</h2>
-  <div class="tool-grid">
-    <a href="/bmi/" class="tool-card">
-      <div class="icon">⚖️</div>
-      <span class="badge" style="background:#dcfce7;color:#16a34a">Health</span>
-      <h3>BMI Calculator</h3>
-      <p>Calculate your Body Mass Index with metric or imperial units. Includes BMI categories, ideal weight range, and an interactive gauge.</p>
-    </a>
-  </div>
+        <form id="mortgageForm" onsubmit="return false;">
+          <div class="form-group">
+            <label for="homePrice">Home Price (<span class="currency-label">$</span>)</label>
+            <input type="text" inputmode="numeric" id="homePrice" placeholder="e.g. 700,000" value="700,000" oninput="fmtInput(this);calculate()" />
+          </div>
+          <div class="form-group">
+            <label>Down Payment</label>
+            <div style="display:flex;gap:0.5rem;">
+              <div style="position:relative;flex:1;">
+                <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.9rem;">$</span>
+                <input type="text" inputmode="numeric" id="downPayment" placeholder="140,000" value="140,000" oninput="fmtInput(this);syncDpPct();calculate()" style="padding-left:1.6rem;" />
+              </div>
+              <div style="position:relative;width:90px;">
+                <input type="number" id="downPaymentPct" placeholder="20" value="20" min="0" max="100" step="0.1" oninput="syncDpDollar();calculate()" style="padding-right:1.6rem;" />
+                <span style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.9rem;">%</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="loanTerm">Amortization Period</label>
+            <select id="loanTerm" onchange="calculate()">
+              <option value="25">25 years</option>
+              <option value="30">30 years</option>
+              <option value="20">20 years</option>
+              <option value="15">15 years</option>
+              <option value="10">10 years</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="interestRate">Annual Interest Rate (%)</label>
+            <input type="number" id="interestRate" placeholder="e.g. 5.0" step="0.01" min="0" value="5.0" oninput="calculate()" />
+          </div>
+          <div class="form-group">
+            <label for="propertyTax">Annual Property Tax (<span class="currency-label">$</span>) <span style="font-weight:400;color:#94a3b8;">(optional)</span></label>
+            <input type="text" inputmode="numeric" id="propertyTax" placeholder="e.g. 4,800" oninput="fmtInput(this);calculate()" />
+          </div>
+          <div class="form-group">
+            <label for="homeInsurance">Annual Home Insurance (<span class="currency-label">$</span>) <span style="font-weight:400;color:#94a3b8;">(optional)</span></label>
+            <input type="text" inputmode="numeric" id="homeInsurance" placeholder="e.g. 1,200" oninput="fmtInput(this);calculate()" />
+          </div>
+        </form>
 
-  <h2 style="font-size:1.1rem;font-weight:700;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;margin:2rem 0 1rem;">Time Tools</h2>
-  <div class="tool-grid">
-    <a href="/world-clock/" class="tool-card">
-      <div class="icon">🌍</div>
-      <span class="badge" style="background:#fef9c3;color:#854d0e">Time</span>
-      <h3>World Clock</h3>
-      <p>Live current time in 35+ major cities. Compare time zones, convert times, and see which cities are currently in business hours.</p>
-    </a>
-  </div>
+        <div class="result-box" id="result">
+          <div class="result-label">Estimated Monthly Payment</div>
+          <div class="result-main" id="monthlyPayment">—</div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="val" id="loanAmount">—</div>
+              <div class="lbl">Loan Amount</div>
+            </div>
+            <div class="result-item">
+              <div class="val" id="totalInterest">—</div>
+              <div class="lbl">Total Interest</div>
+            </div>
+            <div class="result-item">
+              <div class="val" id="totalCost">—</div>
+              <div class="lbl">Total Cost</div>
+            </div>
+            <div class="result-item">
+              <div class="val" id="firstPrincipal">—</div>
+              <div class="lbl">1st Mo. Principal</div>
+            </div>
+            <div class="result-item">
+              <div class="val" id="firstInterest">—</div>
+              <div class="lbl">1st Mo. Interest</div>
+            </div>
+          </div>
 
-  <h2 style="font-size:1.1rem;font-weight:700;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;margin:2rem 0 1rem;">English Learning</h2>
-  <div class="tool-grid">
-    <a href="/flashcards/" class="tool-card">
-      <div class="icon">🃏</div>
-      <span class="badge" style="background:#fce7f3;color:#be185d">English</span>
-      <h3>English Flashcards</h3>
-      <p>Study B1/B2 vocabulary, idioms, collocations, and formal writing expressions. Five decks, flip animations, and progress tracking.</p>
-    </a>
-    <a href="/phrasal-verbs/" class="tool-card">
-      <div class="icon">🔄</div>
-      <span class="badge" style="background:#fce7f3;color:#be185d">English</span>
-      <h3>Phrasal Verb Reference</h3>
-      <p>Browse 120+ phrasal verbs with definitions and examples. Search, filter by base verb, and mark the ones you know — with a built-in quiz mode.</p>
-    </a>
-  </div>
+          <div id="canadaExtras" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid #bfdbfe;">
+            <div class="result-grid">
+              <div class="result-item">
+                <div class="val" id="cmhcPremium">—</div>
+                <div class="lbl">CMHC Insurance</div>
+              </div>
+              <div class="result-item">
+                <div class="val" id="stressRate">—</div>
+                <div class="lbl">Stress Test Rate</div>
+              </div>
+              <div class="result-item">
+                <div class="val" id="stressPayment">—</div>
+                <div class="lbl">Stress Test Payment</div>
+              </div>
+            </div>
+            <p id="cmhcNote" style="font-size:0.78rem;color:#64748b;margin-top:0.75rem;"></p>
+          </div>
+        </div>
+      </div>
 
-  <h2 style="font-size:1.1rem;font-weight:700;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;margin:2rem 0 1rem;">Developer Tools</h2>
-  <div class="tool-grid">
-    <a href="/json-formatter/" class="tool-card">
-      <div class="icon">🔧</div>
-      <span class="badge" style="background:#f3e8ff;color:#7c3aed">Dev</span>
-      <h3>JSON Formatter</h3>
-      <p>Format, validate, and minify JSON. Convert JSON to CSV or CSV to JSON — all in your browser, nothing uploaded anywhere.</p>
-    </a>
-    <a href="/zip/" class="tool-card">
-      <div class="icon">📦</div>
-      <span class="badge" style="background:#f3e8ff;color:#7c3aed">Dev</span>
-      <h3>ZIP / Unzip</h3>
-      <p>Create ZIP archives from any files, or extract files from a ZIP — all processed locally in your browser with complete privacy.</p>
-    </a>
-  </div>
+      <!-- Charts -->
+      <div class="card" id="chartsCard" style="display:none;">
+        <div class="chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+          <div>
+            <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">COST BREAKDOWN</h3>
+            <div style="position:relative;height:280px;"><canvas id="donutChart"></canvas></div>
+          </div>
+          <div>
+            <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">PRINCIPAL vs INTEREST</h3>
+            <div style="position:relative;height:280px;"><canvas id="barChart"></canvas></div>
+          </div>
+        </div>
+      </div>
 
-  <div style="max-width:720px;margin-top:3rem;">
-    <div class="card prose">
-      <h2>What Is G9 Toolkit?</h2>
-      <p>G9 Toolkit is a collection of free, accurate online calculators and tools built to help you make better financial and everyday decisions. Every tool runs entirely in your browser — no account required, no data sent to any server.</p>
+      <!-- Amortization table -->
+      <div class="card" id="amortCard" style="display:none;">
+        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;">Amortization Schedule</h2>
+        <div class="table-wrap">
+          <table id="amortTable">
+            <thead>
+              <tr><th>Year</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>
+            </thead>
+            <tbody id="amortBody"></tbody>
+          </table>
+        </div>
+      </div>
 
-      <h2>Mortgage Calculator — Canada &amp; US</h2>
-      <p>Our mortgage calculator is built specifically for Canadian and American homebuyers. For Canada, it uses the legally required semi-annual compounding formula under the Interest Act, calculates CMHC mortgage insurance premiums for down payments under 20%, and shows your stress test qualifying payment. For the US, it uses standard monthly compounding.</p>
-      <p>Enter your home price, down payment, amortization period, and interest rate to instantly see your monthly payment, total interest paid, and a full year-by-year amortization schedule.</p>
+      <!-- Educational content -->
+      <div class="card prose">
+        <h2>How to Use This Mortgage Calculator</h2>
+        <p>Select your country (Canada or US), enter your home price, down payment, amortization period, and interest rate. Results update instantly. For Canada, we also calculate your CMHC insurance premium (if applicable) and stress test qualifying payment.</p>
 
-      <h2>Why Use G9 Toolkit?</h2>
-      <ul>
-        <li><strong>100% free</strong> — no subscription, no hidden fees</li>
-        <li><strong>No login required</strong> — open any tool and start calculating immediately</li>
-        <li><strong>Accurate formulas</strong> — Canadian mortgages use the correct semi-annual compounding method required by Canadian law</li>
-        <li><strong>Privacy first</strong> — all calculations happen in your browser; nothing is stored or sent anywhere</li>
-        <li><strong>Mobile friendly</strong> — works on any device, any screen size</li>
-      </ul>
+        <h2>Canada vs US: Key Differences</h2>
+        <p><strong>Canada</strong> uses semi-annual compounding by law (Interest Act). The effective monthly rate is calculated as:</p>
+        <p><strong>r = (1 + annual rate / 2)^(1/6) − 1</strong></p>
+        <p><strong>United States</strong> uses monthly compounding: <strong>r = annual rate / 12</strong></p>
+        <p>Both use the standard amortization formula: <strong>M = P × [r(1+r)ⁿ] / [(1+r)ⁿ − 1]</strong></p>
 
-      <h2>Canadian Mortgage Basics</h2>
-      <p>In Canada, mortgage interest is compounded semi-annually by law (twice per year), not monthly like in the US. This means the effective monthly rate is lower than simply dividing the annual rate by 12. The correct formula is:</p>
-      <p><strong>Monthly rate = (1 + annual rate / 2)^(1/6) − 1</strong></p>
-      <p>If your down payment is less than 20% of the purchase price, you are required to purchase CMHC mortgage default insurance. The premium ranges from 2.80% to 4.00% of the loan amount depending on your down payment percentage, and is added to your mortgage principal.</p>
-      <p>Canadian lenders also apply a mortgage stress test: you must qualify at the higher of your contract rate plus 2%, or the minimum qualifying rate of 5.25%. Our calculator shows both your actual payment and your stress test payment.</p>
+        <h2>What Is CMHC Insurance? (Canada)</h2>
+        <p>If your down payment is less than 20% in Canada, you must purchase mortgage default insurance through CMHC (or Sagen/Canada Guaranty). The premium is added to your mortgage principal:</p>
+        <ul>
+          <li>5%–9.99% down → 4.00% of loan amount</li>
+          <li>10%–14.99% down → 3.10% of loan amount</li>
+          <li>15%–19.99% down → 2.80% of loan amount</li>
+          <li>20%+ down → No CMHC required</li>
+        </ul>
 
-      <h2>US Mortgage Basics</h2>
-      <p>In the United States, mortgage interest is compounded monthly. The monthly rate is simply the annual rate divided by 12. Standard US mortgages are typically 15 or 30 years. Private Mortgage Insurance (PMI) is required if your down payment is less than 20%.</p>
+        <h2>What Is the Mortgage Stress Test? (Canada)</h2>
+        <p>Canadian lenders must qualify you at the higher of: your contract rate + 2%, or 5.25%. This stress test payment is shown so you can see what rate you must qualify at — your actual payment will be lower.</p>
+
+        <h2>Tips for Getting a Lower Mortgage Payment</h2>
+        <ul>
+          <li>Increase your down payment to 20%+ to avoid CMHC insurance (Canada)</li>
+          <li>Shop lenders — even 0.25% rate difference saves thousands over 25 years</li>
+          <li>A shorter amortization (e.g. 20 years vs 25) saves significant interest</li>
+          <li>Improve your credit score before applying</li>
+        </ul>
+
+        <h2>Understanding Amortization: Why It Matters So Much</h2>
+        <p>Amortization is the length of time it takes to pay off your mortgage in full. In Canada the maximum for insured mortgages (less than 20% down) is 25 years; uninsured mortgages can go up to 30 years. In the US, 15 and 30-year terms are most common.</p>
+        <p>The amortization period dramatically affects both your monthly payment and total interest paid. Consider a $600,000 mortgage at 5.5%:</p>
+        <ul>
+          <li><strong>25-year amortization:</strong> ~$3,660/month — total interest: ~$498,000</li>
+          <li><strong>20-year amortization:</strong> ~$4,100/month — total interest: ~$384,000</li>
+          <li><strong>15-year amortization:</strong> ~$4,900/month — total interest: ~$282,000</li>
+        </ul>
+        <p>Choosing 20 years over 25 costs ~$440 more per month but saves over $114,000 in interest. Use the amortization table above to see the year-by-year breakdown for your specific situation.</p>
+
+        <h2>Fixed vs Variable Rate Mortgages</h2>
+        <p><strong>Fixed rate mortgages</strong> lock your rate for the full term (typically 1–5 years in Canada, up to 30 years in the US). Your payment never changes during the term — predictable budgeting, but generally a higher rate because the lender absorbs the risk of rate increases.</p>
+        <p><strong>Variable rate mortgages</strong> move with the lender's prime rate, which tracks the Bank of Canada or US Federal Reserve policy rate. Variable rates have historically been lower over long periods but carry the risk of payment increases — as borrowers experienced sharply in 2022–2023. Your risk tolerance and budget flexibility should guide this decision more than rate forecasts.</p>
+
+        <h2>How Lenders Assess Your Mortgage Application</h2>
+        <p><strong>Credit score:</strong> In Canada, 680+ is required by most lenders; 720+ gets the best rates. In the US, conventional loans require 620+, and the best rates go to borrowers with 740+.</p>
+        <p><strong>Gross Debt Service (GDS) ratio (Canada):</strong> The percentage of gross monthly income going toward housing costs (mortgage + property tax + heat + 50% of condo fees). Lenders want this below 32–39%.</p>
+        <p><strong>Total Debt Service (TDS) ratio (Canada):</strong> All debt payments including housing. Most lenders cap this at 44%. The US equivalent (DTI) should stay below 43%.</p>
+        <p><strong>Employment history:</strong> Lenders prefer at least two years of stable employment. Self-employed borrowers typically need two years of Notice of Assessments (Canada) or tax returns (US).</p>
+        <p><strong>Down payment source:</strong> Lenders require proof the down payment has been in your account at least 90 days, or a gift letter if it came from family. Borrowed down payments are not allowed for high-ratio mortgages.</p>
+
+        <h2>First-Time Home Buyer Programs</h2>
+        <p><strong>Canada — First Home Savings Account (FHSA):</strong> Introduced in 2023, allows first-time buyers to contribute up to $8,000/year (lifetime max $40,000) in a tax-sheltered account for a first home purchase. Contributions are tax-deductible; qualifying withdrawals are tax-free.</p>
+        <p><strong>Canada — Home Buyers' Plan (HBP):</strong> Withdraw up to $35,000 from your RRSP ($70,000 per couple) for a down payment, repayable over 15 years.</p>
+        <p><strong>US — FHA Loans:</strong> Down payments as low as 3.5% for borrowers with 580+ credit scores. Requires mortgage insurance premiums but accessible to buyers who don't qualify for conventional loans.</p>
+        <p><strong>US — VA Loans:</strong> Available to eligible veterans and active-duty service members. No down payment and no private mortgage insurance required.</p>
+
+        <h2>Mortgage Renewal and Refinancing</h2>
+        <p>In Canada, mortgages renew every 1–5 years at current market rates — unlike the US where a 30-year fixed locks in your rate for the entire loan. At renewal you can switch lenders without penalty, making it the best time to renegotiate. Start shopping 4–6 months before your renewal date.</p>
+        <p>Refinancing before term-end typically triggers a prepayment penalty in Canada — either 3 months' interest or the Interest Rate Differential (IRD), whichever is greater. Always calculate the break-even point before refinancing.</p>
+
+        <h2>Making Prepayments to Save on Interest</h2>
+        <p>Most Canadian mortgages allow annual prepayments of 10–20% of the original principal without penalty. On a $500,000 mortgage at 5.5% over 25 years, a single $10,000 lump-sum prepayment at end of year one saves approximately $22,000 in interest and cuts 14 months off your amortization.</p>
+        <p>Switching to accelerated bi-weekly payments (26 payments/year instead of 12 monthly) is equivalent to one extra monthly payment per year — shortening a 25-year mortgage by about 3 years with no change to your lifestyle or budget.</p>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+      <div class="ad-slot ad-slot-sidebar"></div>
+      <div class="ad-slot ad-slot-sidebar"></div>
+      <div class="card" style="font-size:0.88rem;color:#475569;" id="quickFacts">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.75rem;">Quick Facts</h3>
+        <div id="factsCA">
+          <ul style="padding-left:1.2rem;line-height:2;">
+            <li>Min down payment: 5% (under $500k)</li>
+            <li>Max amortization: 25 yrs (insured)</li>
+            <li>CMHC required if down &lt; 20%</li>
+            <li>Stress test: contract rate + 2%</li>
+            <li>Compounding: semi-annual by law</li>
+          </ul>
+        </div>
+        <div id="factsUS" style="display:none;">
+          <ul style="padding-left:1.2rem;line-height:2;">
+            <li>Min down: 3% (conventional)</li>
+            <li>30-year fixed is most common</li>
+            <li>PMI required if down &lt; 20%</li>
+            <li>DTI should be under 43%</li>
+            <li>Compounding: monthly</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="ad-slot ad-slot-bottom"></div>
+
+  <!-- City price trends -->
+  <div class="card" style="margin-top:2rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.25rem;">
+      <div>
+        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:0.2rem;">Canadian Home Price Trends</h2>
+        <p style="font-size:0.82rem;color:#94a3b8;margin:0;">Average benchmark price · Source: CREA</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;" id="cityTabs"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem;" id="cityStats"></div>
+    <div style="position:relative;height:300px;"><canvas id="trendChart"></canvas></div>
+  </div>
+
+  <!-- More Tools -->
+  <div style="margin-top:3rem;">
+    <h2 style="font-size:1.1rem;font-weight:700;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:1rem;">More Free Tools</h2>
+    <div class="tool-grid">
+      <a href="/bmi/" class="tool-card">
+        <div class="icon">⚖️</div>
+        <span class="badge" style="background:#dcfce7;color:#16a34a">Health</span>
+        <h3>BMI Calculator</h3>
+        <p>Calculate your Body Mass Index with metric or imperial units. Includes categories, ideal weight range, and an interactive gauge.</p>
+      </a>
+      <a href="/world-clock/" class="tool-card">
+        <div class="icon">🌍</div>
+        <span class="badge" style="background:#fef9c3;color:#854d0e">Time</span>
+        <h3>World Clock</h3>
+        <p>Live current time in 35+ cities. Compare time zones, convert times, and see which cities are in business hours.</p>
+      </a>
+      <a href="/flashcards/" class="tool-card">
+        <div class="icon">🃏</div>
+        <span class="badge" style="background:#fce7f3;color:#be185d">English</span>
+        <h3>English Flashcards</h3>
+        <p>10 decks — everyday English, travel, beginner to advanced, phrasal verbs, idioms, and more.</p>
+      </a>
+      <a href="/phrasal-verbs/" class="tool-card">
+        <div class="icon">🔄</div>
+        <span class="badge" style="background:#fce7f3;color:#be185d">English</span>
+        <h3>Phrasal Verb Reference</h3>
+        <p>Browse 120+ phrasal verbs with definitions, examples, search, and a built-in quiz mode.</p>
+      </a>
+      <a href="/json-formatter/" class="tool-card">
+        <div class="icon">🔧</div>
+        <span class="badge" style="background:#f3e8ff;color:#7c3aed">Dev</span>
+        <h3>JSON Formatter</h3>
+        <p>Format, validate, and minify JSON. Convert JSON to CSV or CSV to JSON — nothing uploaded.</p>
+      </a>
+      <a href="/zip/" class="tool-card">
+        <div class="icon">📦</div>
+        <span class="badge" style="background:#f3e8ff;color:#7c3aed">Dev</span>
+        <h3>ZIP / Unzip</h3>
+        <p>Create ZIP archives or extract files — all processed locally in your browser with complete privacy.</p>
+      </a>
+    </div>
+  </div>
 </div>
 
 <footer>
@@ -144,13 +333,13 @@
     </div>
     <div class="footer-links">
       <h4>Tools</h4>
-      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/">Mortgage Calculator</a>
       <a href="/bmi/">BMI Calculator</a>
       <a href="/world-clock/">World Clock</a>
-      <a href="/json-formatter/">JSON Formatter</a>
-      <a href="/zip/">ZIP / Unzip</a>
       <a href="/flashcards/">English Flashcards</a>
       <a href="/phrasal-verbs/">Phrasal Verbs</a>
+      <a href="/json-formatter/">JSON Formatter</a>
+      <a href="/zip/">ZIP / Unzip</a>
     </div>
     <div class="footer-links">
       <h4>Company</h4>
@@ -163,8 +352,285 @@
       <a href="/terms/">Terms of Service</a>
     </div>
   </div>
-  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved.</div>
+  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved. This calculator is for informational purposes only.</div>
 </footer>
+
+<script>
+  let country = 'CA';
+
+  function setCountry(c) {
+    country = c;
+    document.getElementById('btnCA').style.cssText = `flex:1;padding:0.6rem;background:${c==='CA'?'#2563eb':'#e2e8f0'};color:${c==='CA'?'#fff':'#1e293b'};border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;`;
+    document.getElementById('btnUS').style.cssText = `flex:1;padding:0.6rem;background:${c==='US'?'#2563eb':'#e2e8f0'};color:${c==='US'?'#fff':'#1e293b'};border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;`;
+    document.getElementById('factsCA').style.display = c === 'CA' ? 'block' : 'none';
+    document.getElementById('factsUS').style.display = c === 'US' ? 'block' : 'none';
+    document.getElementById('loanTerm').value = c === 'CA' ? '25' : '30';
+    calculate();
+  }
+
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+  function fmtDec(n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+
+  function cmhcRate(downPct) {
+    if (downPct >= 20) return 0;
+    if (downPct >= 15) return 0.028;
+    if (downPct >= 10) return 0.031;
+    return 0.04;
+  }
+
+  function monthlyRate(annualRate, isCanada) {
+    const r = annualRate / 100;
+    if (isCanada) return Math.pow(1 + r / 2, 1 / 6) - 1;
+    return r / 12;
+  }
+
+  function calcPayment(principal, mRate, n) {
+    return principal * (mRate * Math.pow(1 + mRate, n)) / (Math.pow(1 + mRate, n) - 1);
+  }
+
+  function fmtInput(el) {
+    const pos = el.selectionStart;
+    const raw = el.value.replace(/[^0-9]/g, '');
+    const before = el.value.slice(0, pos).replace(/[^0-9]/g, '').length;
+    if (raw === '') { el.value = ''; return; }
+    const formatted = parseInt(raw, 10).toLocaleString('en-CA');
+    el.value = formatted;
+    let count = 0, newPos = 0;
+    for (let i = 0; i < formatted.length && count < before; i++, newPos = i)
+      if (formatted[i] !== ',') count++;
+    el.setSelectionRange(newPos, newPos);
+  }
+
+  function rawNum(id) {
+    return parseFloat(document.getElementById(id).value.replace(/,/g, '')) || 0;
+  }
+
+  function syncDpPct() {
+    const price = rawNum('homePrice'), dp = rawNum('downPayment');
+    if (price > 0) document.getElementById('downPaymentPct').value = ((dp / price) * 100).toFixed(1);
+  }
+
+  function syncDpDollar() {
+    const price = rawNum('homePrice');
+    const pct = parseFloat(document.getElementById('downPaymentPct').value) || 0;
+    document.getElementById('downPayment').value = Math.round(price * pct / 100).toLocaleString('en-CA');
+  }
+
+  function calculate() {
+    const homePrice = rawNum('homePrice');
+    const downPayment = rawNum('downPayment');
+    const loanTermYears = parseInt(document.getElementById('loanTerm').value);
+    const annualRate = parseFloat(document.getElementById('interestRate').value) || 0;
+    const propertyTax = rawNum('propertyTax');
+    const homeInsurance = rawNum('homeInsurance');
+
+    if (homePrice <= 0 || annualRate <= 0) return;
+
+    const downPct = homePrice > 0 ? (downPayment / homePrice) * 100 : 0;
+    const isCanada = country === 'CA';
+    let principal = homePrice - downPayment;
+    if (principal <= 0) return;
+
+    let cmhc = 0;
+    if (isCanada) {
+      const rate = cmhcRate(downPct);
+      cmhc = principal * rate;
+      principal += cmhc;
+    }
+
+    const n = loanTermYears * 12;
+    const mRate = monthlyRate(annualRate, isCanada);
+    const pi = calcPayment(principal, mRate, n);
+    const monthlyExtras = (propertyTax + homeInsurance) / 12;
+    const totalMonthly = pi + monthlyExtras;
+    const totalInterest = (pi * n) - principal;
+    const firstMonthInterest = principal * mRate;
+    const firstMonthPrincipal = pi - firstMonthInterest;
+
+    document.getElementById('monthlyPayment').textContent = fmtDec(totalMonthly);
+    document.getElementById('loanAmount').textContent = fmt(principal);
+    document.getElementById('totalInterest').textContent = fmt(totalInterest);
+    document.getElementById('totalCost').textContent = fmt(principal + totalInterest);
+    document.getElementById('firstPrincipal').textContent = fmtDec(firstMonthPrincipal);
+    document.getElementById('firstInterest').textContent = fmtDec(firstMonthInterest);
+    document.getElementById('result').classList.add('show');
+
+    const extrasEl = document.getElementById('canadaExtras');
+    if (isCanada) {
+      extrasEl.style.display = 'block';
+      const stressRate = Math.max(annualRate + 2, 5.25);
+      const stressMRate = monthlyRate(stressRate, true);
+      const stressPI = calcPayment(principal, stressMRate, n);
+      document.getElementById('cmhcPremium').textContent = cmhc > 0 ? fmt(cmhc) : 'Not required';
+      document.getElementById('stressRate').textContent = stressRate.toFixed(2) + '%';
+      document.getElementById('stressPayment').textContent = fmtDec(stressPI + monthlyExtras);
+      document.getElementById('cmhcNote').textContent = cmhc > 0
+        ? `CMHC premium of ${fmt(cmhc)} added to principal. Down payment of ${downPct.toFixed(1)}% triggers the ${(cmhcRate(downPct)*100)}% rate.`
+        : 'No CMHC required — down payment is 20% or more.';
+    } else {
+      extrasEl.style.display = 'none';
+    }
+
+    buildAmortization(principal, mRate, n, pi);
+  }
+
+  let donutInst = null, barInst = null;
+
+  function updateCharts(principal, totalInterest, yearLabels, yearBalances, yearPrincipals, yearInterests) {
+    const donutCtx = document.getElementById('donutChart').getContext('2d');
+    if (donutInst) donutInst.destroy();
+    donutInst = new Chart(donutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Principal', 'Total Interest'],
+        datasets: [{ data: [principal, totalInterest], backgroundColor: ['#4ade80','#fbbf24'], borderWidth: 0 }]
+      },
+      options: {
+        maintainAspectRatio: false, cutout: '68%',
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } },
+          tooltip: { callbacks: { label: ctx => ' $' + Math.round(ctx.raw).toLocaleString('en-CA') } }
+        }
+      }
+    });
+
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    if (barInst) barInst.destroy();
+    barInst = new Chart(barCtx, {
+      data: {
+        labels: yearLabels,
+        datasets: [
+          { type:'bar',  label:'Interest',  data:yearInterests,  backgroundColor:'#fbbf24', stack:'a', yAxisID:'bars', order:2 },
+          { type:'bar',  label:'Principal', data:yearPrincipals, backgroundColor:'#4ade80', stack:'a', yAxisID:'bars', order:2 },
+          { type:'line', label:'Balance',   data:yearBalances,   borderColor:'#1e293b', borderWidth:2.5, pointRadius:0, tension:0.4, yAxisID:'line', order:1 }
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position:'top', labels: { font:{ size:12 }, padding:12, boxWidth:12 } },
+          tooltip: { callbacks: { label: ctx => ' $' + Math.round(ctx.raw).toLocaleString('en-CA') } }
+        },
+        scales: {
+          x:    { stacked:true, grid:{display:false}, ticks:{ maxTicksLimit:8, font:{size:11} } },
+          bars: { type:'linear', position:'left',  stacked:true, grid:{color:'#f1f5f9'}, ticks:{ callback: v => '$'+(v>=1000?(v/1000).toFixed(0)+'k':v), font:{size:11} } },
+          line: { type:'linear', position:'right', grid:{display:false}, ticks:{ callback: v => '$'+(v>=1000?(v/1000).toFixed(0)+'k':v), font:{size:11} } }
+        }
+      }
+    });
+
+    document.getElementById('chartsCard').style.display = 'block';
+  }
+
+  function buildAmortization(principal, mRate, n, monthlyPI) {
+    let balance = principal;
+    const tbody = document.getElementById('amortBody');
+    tbody.innerHTML = '';
+    const yearLabels=[], yearBalances=[], yearPrincipals=[], yearInterests=[];
+    let yearPrincipal=0, yearInterest=0;
+    for (let month = 1; month <= n; month++) {
+      const interestPayment = balance * mRate;
+      const principalPayment = monthlyPI - interestPayment;
+      balance -= principalPayment;
+      yearPrincipal += principalPayment;
+      yearInterest += interestPayment;
+      if (month % 12 === 0 || month === n) {
+        const year = Math.ceil(month / 12);
+        yearLabels.push('Yr ' + year);
+        yearBalances.push(Math.max(0, balance));
+        yearPrincipals.push(Math.round(yearPrincipal));
+        yearInterests.push(Math.round(yearInterest));
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>Year ${year}</td><td>${fmt(yearPrincipal)}</td><td>${fmt(yearInterest)}</td><td>${fmt(Math.max(0,balance))}</td>`;
+        tbody.appendChild(row);
+        yearPrincipal = 0; yearInterest = 0;
+      }
+    }
+    document.getElementById('amortCard').style.display = 'block';
+    updateCharts(principal, (monthlyPI*n)-principal, yearLabels, yearBalances, yearPrincipals, yearInterests);
+  }
+
+  const trendData = {
+    Vancouver:{ color:'#2563eb', prices:[820,900,1030,1050,990,1030,1230,1360,1200,1180,1200] },
+    Toronto:  { color:'#7c3aed', prices:[620,730,820,790,820,930,1095,1190,1050,1070,1050] },
+    Calgary:  { color:'#d97706', prices:[450,430,440,450,430,430,480,530,560,590,590] },
+    Ottawa:   { color:'#059669', prices:[360,380,400,420,450,520,660,700,630,650,650] },
+    Montréal: { color:'#dc2626', prices:[310,320,330,350,390,450,520,560,530,550,550] },
+    Edmonton: { color:'#0891b2', prices:[370,350,360,360,350,350,380,400,410,430,430] },
+  };
+  const trendYears = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+  let trendInst = null;
+
+  function renderTrend(city) {
+    const d = trendData[city];
+    const prices = d.prices;
+    const current = prices[prices.length-1];
+    const base = prices[0];
+    const peak = Math.max(...prices);
+    const peakYear = trendYears[prices.indexOf(peak)];
+    const change = ((current-base)/base*100).toFixed(0);
+
+    document.getElementById('cityStats').innerHTML = `
+      <div style="background:#f8fafc;border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-size:1.3rem;font-weight:800;color:#1e293b;">$${(current*1000).toLocaleString('en-CA')}</div>
+        <div style="font-size:0.78rem;color:#64748b;margin-top:0.2rem;">2025 avg price</div>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-size:1.3rem;font-weight:800;color:#1e293b;">$${(peak*1000).toLocaleString('en-CA')}</div>
+        <div style="font-size:0.78rem;color:#64748b;margin-top:0.2rem;">Peak (${peakYear})</div>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-size:1.3rem;font-weight:800;color:${change>=0?'#059669':'#dc2626'};">${change>=0?'+':''}${change}%</div>
+        <div style="font-size:0.78rem;color:#64748b;margin-top:0.2rem;">Since 2015</div>
+      </div>`;
+
+    document.querySelectorAll('.trend-tab').forEach(btn => {
+      const active = btn.dataset.city === city;
+      btn.style.background = active ? d.color : '#f1f5f9';
+      btn.style.color = active ? '#fff' : '#475569';
+      btn.style.borderColor = active ? d.color : '#e2e8f0';
+    });
+
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    if (trendInst) trendInst.destroy();
+    trendInst = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: trendYears,
+        datasets: [{ label: city+' avg price ($k)', data: prices, borderColor: d.color,
+          backgroundColor: d.color+'18', fill:true, tension:0.4, pointRadius:4,
+          pointBackgroundColor: d.color, borderWidth:2.5 }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ' $'+(ctx.raw*1000).toLocaleString('en-CA') } }
+        },
+        scales: {
+          x: { grid:{display:false}, ticks:{font:{size:11}} },
+          y: { grid:{color:'#f1f5f9'}, ticks:{callback: v => '$'+v+'k', font:{size:11}} }
+        }
+      }
+    });
+  }
+
+  function initTrend() {
+    const tabs = document.getElementById('cityTabs');
+    Object.keys(trendData).forEach(city => {
+      const btn = document.createElement('button');
+      btn.className = 'trend-tab';
+      btn.dataset.city = city;
+      btn.textContent = city;
+      btn.style.cssText = 'padding:0.35rem 0.75rem;border-radius:999px;border:1px solid #e2e8f0;background:#f1f5f9;color:#475569;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;';
+      btn.onclick = () => renderTrend(city);
+      tabs.appendChild(btn);
+    });
+    renderTrend('Vancouver');
+  }
+
+  window.addEventListener('load', () => { setCountry('CA'); initTrend(); });
+</script>
 
 </body>
 </html>
