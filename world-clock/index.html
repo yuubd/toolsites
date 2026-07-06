@@ -112,13 +112,34 @@
 
   <div class="card prose" style="margin-top:1rem;">
     <h2>What is UTC?</h2>
-    <p>Coordinated Universal Time (UTC) is the primary time standard by which the world regulates clocks. It is the successor to Greenwich Mean Time (GMT) and does not observe Daylight Saving Time. All time zones are defined as offsets from UTC — for example, New York is UTC−5 in winter (EST) and UTC−4 in summer (EDT).</p>
+    <p>Coordinated Universal Time (UTC) is the primary time standard by which the world regulates clocks. It is the successor to Greenwich Mean Time (GMT) and does not observe Daylight Saving Time. All time zones are defined as offsets from UTC — for example, New York is UTC−5 in winter (EST) and UTC−4 in summer (EDT). UTC is measured at the 0° meridian passing through Greenwich, London.</p>
+    <p>UTC is maintained by an ensemble of over 400 atomic clocks at national standards laboratories worldwide, coordinated by the International Bureau of Weights and Measures (BIPM). These clocks are accurate to within nanoseconds per day. Occasionally a "leap second" is added to keep UTC aligned with Earth's slightly irregular rotation.</p>
+
+    <h2>How Time Zones Work</h2>
+    <p>The world is divided into 24 primary time zones, each roughly 15 degrees of longitude wide. However, political and practical considerations mean real boundaries are irregular. China spans five geographical time zones but uses a single time (CST, UTC+8) nationwide. India uses UTC+5:30 — a half-hour offset. Nepal uses UTC+5:45 — a 45-minute offset. Australia's three main zones include UTC+9:30 for the Northern Territory.</p>
+    <p>The International Date Line runs roughly along the 180° meridian in the Pacific Ocean, marking where one calendar day ends and the next begins. Countries just east of the line are a full day behind countries just west — which is why Samoa and Tonga, separated by just a few hundred kilometres, have a 25-hour time difference.</p>
 
     <h2>Daylight Saving Time</h2>
-    <p>Daylight Saving Time (DST) advances clocks by one hour during summer months to extend evening daylight. Not all countries observe DST — China, Japan, India, and most of Africa do not. In North America, DST begins the second Sunday in March and ends the first Sunday in November. In Europe, it begins the last Sunday in March and ends the last Sunday in October.</p>
+    <p>Daylight Saving Time (DST) advances clocks by one hour during summer to extend evening daylight. First widely adopted during World War I to conserve fuel, today its energy-saving benefits are disputed and many jurisdictions are moving to eliminate it. China, Japan, India, most of Africa, and Southeast Asia do not observe DST at all.</p>
+    <p>In North America, clocks spring forward on the second Sunday in March and fall back on the first Sunday in November. In Europe the change is the last Sunday in March and last Sunday in October — roughly three weeks later than North America. During this gap, New York to London shifts from 5 hours to 4 hours. The EU voted to end seasonal changes but implementation has been delayed by member-state disagreements.</p>
 
-    <h2>Time zones and international business</h2>
-    <p>When scheduling international meetings, aim for overlapping business hours (roughly 9 AM – 6 PM local time). A meeting that works for New York (EST, UTC−5) at 9 AM is 2 PM in London (GMT, UTC+0) and 10 PM in Tokyo (JST, UTC+9) — often too late for Japanese colleagues. Tools like this world clock help you find times that work for everyone.</p>
+    <h2>Scheduling International Meetings</h2>
+    <p>Finding a meeting time that works across multiple time zones is a daily challenge in global business. Key relationships to know:</p>
+    <ul>
+      <li><strong>New York to London:</strong> 5 hours (EST) / 4 hours (EDT). A 9 AM New York call is 2 PM London — manageable for both sides.</li>
+      <li><strong>New York to Tokyo:</strong> 14 hours (EST). A 7 AM call in New York is 9 PM in Tokyo — very difficult for regular scheduling.</li>
+      <li><strong>London to Singapore:</strong> 8 hours. A 9 AM London call is 5 PM Singapore — workable with early London and late Singapore.</li>
+      <li><strong>Toronto to Vancouver:</strong> 3 hours. Aim for 10–11 AM Eastern for cross-Canada calls — 7–8 AM on the west coast.</li>
+    </ul>
+    <p>When a meeting spans more than three zones it becomes impossible to stay within business hours for everyone. Rotate inconvenient time slots so the burden is shared fairly, or shift to asynchronous communication: recorded video updates, written summaries, and shared task boards.</p>
+
+    <h2>Jet Lag and Circadian Rhythm</h2>
+    <p>Jet lag occurs when your body's internal clock is out of sync with local time after crossing multiple time zones. It's generally worse travelling east (shortening the day) than west (lengthening it). Your circadian rhythm adjusts at roughly one time zone per day — a 10-hour shift can take nearly two weeks to fully resolve.</p>
+    <p>Evidence-based strategies to reduce jet lag: expose yourself to natural daylight at your destination immediately upon arrival, avoid alcohol and caffeine during the flight, adapt to local meal and sleep schedules right away, and consider melatonin (0.5–5 mg) at bedtime in the new time zone to accelerate adjustment.</p>
+
+    <h2>Time Zones in Software Development</h2>
+    <p>Handling time zones correctly is one of the most notorious sources of bugs in software. The golden rule: store all timestamps in UTC, and convert to local time only for display. Never store local time in a database without the UTC offset. Use IANA time zone identifiers (like "America/Toronto" or "Asia/Tokyo") rather than abbreviations like EST or JST, which are ambiguous — EST refers to both Eastern Standard Time (UTC−5) and Australian Eastern Standard Time (UTC+10).</p>
+    <p>The JavaScript <code>Intl.DateTimeFormat</code> API — used to power this world clock — handles IANA time zones natively in all modern browsers, making it the safest and most accurate way to display times across zones without a server round-trip.</p>
   </div>
 
   <div class="ad-slot ad-slot-bottom"></div>

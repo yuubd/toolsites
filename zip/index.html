@@ -143,13 +143,33 @@
 
     <div class="card prose">
       <h2>What is a ZIP file?</h2>
-      <p>ZIP is a file format that supports lossless data compression and can bundle multiple files and folders into a single archive. Developed by Phil Katz in 1989, it is one of the most universally supported compression formats. ZIP files use the .zip extension and are natively supported on Windows, macOS, Linux, iOS, and Android without any additional software.</p>
+      <p>ZIP is a file archive format that supports lossless data compression and can bundle multiple files and folders into a single portable file. Phil Katz created the format in 1989 and released the specification as open and royalty-free, which is why it became so universally adopted. ZIP files use the <code>.zip</code> extension and are natively supported on Windows (since XP), macOS (since 10.3), Linux, iOS, and Android — no third-party software required on any major platform.</p>
+      <p>Internally, a ZIP archive stores each file individually with its own compression settings. This means you can extract a single file without decompressing the entire archive — a significant advantage over formats like tar.gz where all files are compressed together as one stream.</p>
 
-      <h2>Is it safe to use this tool?</h2>
-      <p>Yes. This tool runs entirely in your browser using the <a href="https://stuk.github.io/jszip/" rel="noopener noreferrer" target="_blank">JSZip</a> library. Your files are never sent to any server — all compression and extraction happens locally on your device. Once you close or navigate away from this page, no trace of your files remains.</p>
+      <h2>How ZIP Compression Works</h2>
+      <p>ZIP uses the DEFLATE compression algorithm, which combines two techniques: LZ77 (a dictionary-based compression that replaces repeated byte sequences with references to earlier occurrences) and Huffman coding (a statistical compression that assigns shorter binary codes to more frequent patterns). Together, DEFLATE typically achieves 60–70% compression on text-based files like code, HTML, CSS, and plain text.</p>
+      <p>Binary files like images (JPEG, PNG), videos (MP4), and audio (MP3) are already compressed internally using format-specific algorithms. Trying to ZIP them again produces little to no size reduction — sometimes the file actually gets slightly larger due to overhead. This is why a folder of vacation photos doesn't compress much when zipped, while a folder of source code files might shrink to 20% of its original size.</p>
 
-      <h2>ZIP vs other formats (RAR, 7-Zip, gzip)</h2>
-      <p>ZIP offers the best compatibility — every operating system supports it natively. RAR provides better compression ratios but requires WinRAR or 7-Zip to open. 7-Zip's .7z format offers the highest compression but is less universally supported. gzip (.gz) is common on Linux/macOS for compressing single files. For most everyday use cases — sharing files by email, organizing downloads — ZIP is the right choice.</p>
+      <h2>Is It Safe to Use This Tool?</h2>
+      <p>Yes — completely. This tool uses the open-source <strong>JSZip</strong> library, which runs entirely inside your web browser. Your files are never uploaded to any server, never transmitted over the internet, and never stored anywhere outside your own device. The compression and extraction happen locally using your computer's own processor and memory.</p>
+      <p>You can verify this by opening your browser's network inspector (F12 → Network tab) while using the tool — you'll see no outgoing requests related to your files. When you navigate away from the page, the browser clears all file data from memory automatically. This makes the tool appropriate even for sensitive files like financial documents, legal contracts, or private photos.</p>
+
+      <h2>ZIP vs Other Compression Formats</h2>
+      <p><strong>ZIP</strong> — Best universal compatibility. Natively supported everywhere. Each file compressed individually. Good compression for text. Ideal for sharing files with anyone.</p>
+      <p><strong>RAR</strong> — Better compression than ZIP on many file types, and supports splitting archives across multiple volumes. However, creating RAR archives requires proprietary WinRAR software (though free tools can extract them). Not suitable when you need the recipient to easily open the file without installing software.</p>
+      <p><strong>7-Zip (.7z)</strong> — Highest compression ratios of the common formats, particularly for large collections of similar files. Completely free and open-source. The downside is that <code>.7z</code> files are not natively supported on Windows or macOS — recipients need to install 7-Zip or a compatible tool. Best used within teams or workflows where everyone has the tools installed.</p>
+      <p><strong>gzip (.gz) and tar.gz (.tgz)</strong> — The standard on Linux and macOS command lines. gzip compresses a single file; tar bundles multiple files first, then gzip compresses the bundle. This is more efficient than ZIP for compressing many similar files but requires extracting the entire archive to access any single file.</p>
+      <p><strong>zstd (Zstandard)</strong> — A newer format developed by Facebook (Meta) that offers compression ratios similar to 7-Zip but at much higher speeds. Increasingly used in software distribution, game asset packaging, and database backups. Not yet widely supported as a general-purpose sharing format.</p>
+
+      <h2>Common ZIP Use Cases</h2>
+      <p><strong>Sharing multiple files by email:</strong> Most email clients have attachment size limits and may strip certain file types. Zipping files bundles them into one attachment and can help reduce size for text-heavy content.</p>
+      <p><strong>Website deployment:</strong> Many web hosting control panels (cPanel, etc.) accept ZIP uploads, automatically extracting the contents to your server. This is much faster than uploading dozens of individual files.</p>
+      <p><strong>Software distribution:</strong> Applications and plugins are commonly distributed as ZIP archives. The recipient extracts the contents into their application folder — no installer required.</p>
+      <p><strong>Archiving old projects:</strong> Compressing finished projects into ZIP archives saves disk space (especially for code-heavy projects) and keeps your files organized. Many developers zip old project folders and move them to external storage.</p>
+      <p><strong>Reducing cloud storage usage:</strong> Large folders of text files, documents, and source code can be compressed to a fraction of their size before uploading to cloud storage, reducing costs and upload time.</p>
+
+      <h2>Tips for Getting the Best Compression</h2>
+      <p>To maximize compression: group similar file types together (similar files compress better relative to each other), compress text-heavy content (code, HTML, CSS, logs, CSVs), and avoid re-compressing already-compressed files (images, videos, existing ZIPs). For very large archives, consider 7-Zip's LZMA2 algorithm for significantly better ratios than DEFLATE, especially on repetitive data.</p>
     </div>
 
     <div class="ad-slot ad-slot-bottom"></div>

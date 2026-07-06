@@ -143,16 +143,44 @@
 
     <div class="card prose">
       <h2>What is JSON?</h2>
-      <p>JSON (JavaScript Object Notation) is a lightweight, human-readable format for storing and transporting data. It is based on JavaScript object syntax but is language-independent. JSON supports six data types: strings, numbers, booleans, arrays, objects, and null.</p>
+      <p>JSON (JavaScript Object Notation) is a lightweight, human-readable format for storing and transporting data. It was created by Douglas Crockford in the early 2000s and standardized as RFC 8259. Despite being based on JavaScript object syntax, JSON is completely language-independent and is supported by virtually every modern programming language including Python, Java, Go, Ruby, PHP, Swift, and Rust.</p>
+      <p>JSON supports exactly six data types: <strong>strings</strong> (text in double quotes), <strong>numbers</strong> (integers or decimals, no quotes), <strong>booleans</strong> (<code>true</code> or <code>false</code>), <strong>arrays</strong> (ordered lists in square brackets), <strong>objects</strong> (key-value pairs in curly braces), and <strong>null</strong> (representing the absence of a value). Everything in JSON is built from these six primitives.</p>
 
-      <h2>Common JSON errors</h2>
-      <p><strong>Trailing commas</strong> — JSON does not allow a comma after the last item in an array or object. <code>[1, 2, 3,]</code> is invalid. <strong>Single quotes</strong> — JSON requires double quotes for strings and keys. <strong>Unquoted keys</strong> — unlike JavaScript objects, JSON keys must always be quoted. <strong>Comments</strong> — JSON does not support comments of any kind.</p>
+      <h2>JSON Syntax Rules</h2>
+      <p>JSON has stricter syntax rules than most people expect, especially developers coming from JavaScript where the syntax is more forgiving:</p>
+      <ul>
+        <li><strong>Keys must be strings in double quotes.</strong> <code>{ name: "Alice" }</code> is invalid JSON. It must be <code>{ "name": "Alice" }</code>.</li>
+        <li><strong>No trailing commas.</strong> <code>[1, 2, 3,]</code> is invalid. The last element must have no trailing comma. This is the most common JSON error.</li>
+        <li><strong>Strings require double quotes.</strong> Single quotes are not allowed anywhere in JSON. <code>{ "name": 'Alice' }</code> is invalid.</li>
+        <li><strong>No comments.</strong> JSON has no syntax for comments. If you need annotated config files, consider JSONC (JSON with Comments), YAML, or TOML instead.</li>
+        <li><strong>No undefined.</strong> JavaScript's <code>undefined</code> is not a valid JSON value. Use <code>null</code> to represent the absence of a value.</li>
+        <li><strong>Numbers cannot have leading zeros.</strong> <code>01</code> is invalid; use <code>1</code>. Scientific notation like <code>1.5e10</code> is valid.</li>
+      </ul>
+
+      <h2>Common JSON Errors and How to Fix Them</h2>
+      <p>When you paste JSON into our validator and get an error, the message will tell you the approximate line and character position of the problem. Here are the most frequent issues:</p>
+      <ul>
+        <li><strong>"Unexpected token ,"</strong> — Almost always a trailing comma. Find the last item in the array or object and remove the comma after it.</li>
+        <li><strong>"Unexpected token '"</strong> — Single quotes used instead of double quotes. Replace all single-quoted strings and keys with double quotes.</li>
+        <li><strong>"Unexpected end of JSON input"</strong> — The JSON is incomplete. A bracket or brace was opened but not closed, or the input was truncated.</li>
+        <li><strong>"Unexpected token u in JSON at position 0"</strong> — The input is empty or the string <code>undefined</code> was passed instead of real JSON.</li>
+        <li><strong>"SyntaxError: JSON.parse: expected property name"</strong> — A key is missing quotes, or there's an extra comma before a closing brace.</li>
+      </ul>
+
+      <h2>JSON vs XML</h2>
+      <p>Before JSON became dominant, XML (eXtensible Markup Language) was the standard for data interchange. JSON has largely replaced XML for web APIs because it is more compact, easier to read, and maps directly to native data structures in most languages. A simple record that takes 5 lines in XML can be expressed in 1 line of JSON. However, XML still has advantages: it supports attributes, comments, namespaces, and schemas (XSD), making it better suited for document formats like Microsoft Office files, SVG graphics, and certain enterprise integration scenarios.</p>
 
       <h2>JSON vs CSV</h2>
-      <p>JSON excels at representing nested, hierarchical data — records with mixed types, optional fields, and nested objects or arrays. CSV is simpler and more compact for flat tabular data — spreadsheet exports, data pipelines, and records with uniform fields. Use our converter above to switch between the two formats.</p>
+      <p>JSON and CSV serve different use cases. JSON excels at representing nested, hierarchical data — records with mixed types, optional fields, arrays within objects, and objects within arrays. CSV is simpler and more compact for flat, tabular data with uniform columns — spreadsheet exports, analytics pipelines, and database dumps where every row has the same fields.</p>
+      <p>A key limitation of CSV: it has no standard way to represent nested data, arrays, or multiple data types in a single column without custom encoding. JSON handles all of these naturally. Use our JSON to CSV converter above when you need to import JSON data into Excel, Google Sheets, or a database that expects tabular input.</p>
 
-      <h2>Formatting vs minifying</h2>
-      <p>Formatted (pretty-printed) JSON adds indentation and line breaks to make it human-readable. Minified JSON removes all unnecessary whitespace to reduce file size. Minified JSON is faster to transmit over a network and is the default for API responses; formatted JSON is better for configuration files, logging, and debugging.</p>
+      <h2>Formatting vs Minifying JSON</h2>
+      <p>Formatted (pretty-printed) JSON uses indentation and line breaks to make the structure visually clear. This is ideal for configuration files, API documentation, debugging, and any scenario where a human needs to read the JSON. Indentation size is usually 2 or 4 spaces — 2 spaces is the most common convention for web-related JSON.</p>
+      <p>Minified JSON removes all unnecessary whitespace, reducing file size. For a large API response, minification can reduce payload size by 10–30%. Smaller payloads mean faster network transfers and lower bandwidth costs. Production APIs should always serve minified JSON. When debugging a production API, paste the response into this formatter to immediately see the structure clearly.</p>
+
+      <h2>JSON in Modern Development</h2>
+      <p>JSON is the backbone of modern web APIs. RESTful APIs return JSON. GraphQL responses are JSON. Configuration files like <code>package.json</code>, <code>tsconfig.json</code>, and <code>eslintrc.json</code> are all JSON. Even NoSQL databases like MongoDB store data in a JSON-like format called BSON (Binary JSON).</p>
+      <p>JSON Schema is a vocabulary for validating the structure of JSON documents. It lets you define exactly what fields are required, what types they must be, and what constraints they must satisfy — similar to a database schema, but for JSON. Many API testing tools and CI pipelines use JSON Schema to automatically validate that API responses conform to their documented structure.</p>
     </div>
 
     <div class="ad-slot ad-slot-bottom"></div>
