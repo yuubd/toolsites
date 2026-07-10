@@ -23,6 +23,25 @@
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
   </script>
+  <style>
+    .stat-box { background:#f8fafc; border-radius:10px; padding:0.9rem 1rem; }
+    .stat-val  { font-size:1.15rem; font-weight:800; color:#1e293b; }
+    .stat-lbl  { font-size:0.73rem; color:#64748b; margin-top:0.2rem; }
+    .type-btn  { padding:0.4rem 1rem; border-radius:999px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#475569; font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
+    .type-btn.active { background:#1e293b; color:#fff; border-color:#1e293b; }
+    .trend-tab { padding:0.35rem 0.7rem; border-radius:999px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#475569; font-size:0.76rem; font-weight:600; cursor:pointer; transition:all 0.12s; white-space:nowrap; }
+    .amort-toggle { display:flex; align-items:center; gap:0.5rem; background:none; border:1.5px solid #e2e8f0; border-radius:8px; padding:0.4rem 0.9rem; font-size:0.85rem; font-weight:600; color:#475569; cursor:pointer; transition:all 0.15s; }
+    .amort-toggle:hover { background:#f1f5f9; }
+    .amort-toggle .arrow { transition:transform 0.2s; display:inline-block; }
+    .amort-toggle.open .arrow { transform:rotate(180deg); }
+    .country-tab { padding:0.45rem 1.1rem; border-radius:8px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#475569; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.15s; }
+    .country-tab.active { background:#2563eb; color:#fff; border-color:#2563eb; }
+    @media (max-width:640px) {
+      .chart-grid { grid-template-columns:1fr !important; }
+      .stats-grid { grid-template-columns:repeat(2,1fr) !important; }
+      .trend-tabs-wrap { gap:0.3rem !important; }
+    }
+  </style>
 </head>
 <body>
 
@@ -143,30 +162,36 @@
         </div>
       </div>
 
-      <!-- Charts -->
-      <div class="card" id="chartsCard" style="display:none;">
-        <div class="chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+      <!-- Charts + Amortization combined card -->
+      <div class="card" id="amortCard" style="display:none;">
+        <!-- Charts row -->
+        <div class="chart-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;margin-bottom:2rem;">
           <div>
-            <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">COST BREAKDOWN</h3>
-            <div style="position:relative;height:280px;"><canvas id="donutChart"></canvas></div>
+            <h3 style="font-size:0.85rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;letter-spacing:0.04em;">COST BREAKDOWN</h3>
+            <div style="position:relative;height:260px;"><canvas id="donutChart"></canvas></div>
           </div>
           <div>
-            <h3 style="font-size:0.9rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;">PRINCIPAL vs INTEREST</h3>
-            <div style="position:relative;height:280px;"><canvas id="barChart"></canvas></div>
+            <h3 style="font-size:0.85rem;font-weight:700;color:#475569;text-align:center;margin-bottom:0.75rem;letter-spacing:0.04em;">PRINCIPAL vs INTEREST BY YEAR</h3>
+            <div style="position:relative;height:260px;"><canvas id="barChart"></canvas></div>
           </div>
         </div>
-      </div>
 
-      <!-- Amortization table -->
-      <div class="card" id="amortCard" style="display:none;">
-        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;">Amortization Schedule</h2>
-        <div class="table-wrap">
-          <table id="amortTable">
-            <thead>
-              <tr><th>Year</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>
-            </thead>
-            <tbody id="amortBody"></tbody>
-          </table>
+        <!-- Amortization table header with toggle -->
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f1f5f9;padding-top:1.25rem;">
+          <h2 style="font-size:1rem;font-weight:700;margin:0;">Amortization Schedule</h2>
+          <button id="amortToggleBtn" class="amort-toggle" onclick="toggleAmort()">
+            Show table <span class="arrow">▾</span>
+          </button>
+        </div>
+        <div id="amortTableWrap" style="display:none;margin-top:1rem;">
+          <div class="table-wrap">
+            <table id="amortTable">
+              <thead>
+                <tr><th>Year</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>
+              </thead>
+              <tbody id="amortBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -268,17 +293,40 @@
 
   <div class="ad-slot ad-slot-bottom"></div>
 
-  <!-- City price trends -->
+  <!-- Home Price Trends -->
   <div class="card" style="margin-top:2rem;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.25rem;">
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;">
       <div>
-        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:0.2rem;">Canadian Home Price Trends</h2>
-        <p style="font-size:0.82rem;color:#94a3b8;margin:0;">Average benchmark price · Source: CREA</p>
+        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:0.2rem;">Home Price Trends</h2>
+        <p style="font-size:0.8rem;color:#94a3b8;margin:0;">Benchmark / median prices 2015–2025 · Sources: CREA (CA), NAR / Zillow (US)</p>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;" id="cityTabs"></div>
+      <!-- CA / US toggle (independent of calculator) -->
+      <div style="display:flex;gap:0.4rem;">
+        <button id="trendBtnCA" class="country-tab active" onclick="setTrendCountry('CA')">🇨🇦 Canada</button>
+        <button id="trendBtnUS" class="country-tab" onclick="setTrendCountry('US')">🇺🇸 United States</button>
+      </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem;" id="cityStats"></div>
-    <div style="position:relative;height:300px;"><canvas id="trendChart"></canvas></div>
+
+    <!-- Property type filter -->
+    <div style="display:flex;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+      <button id="trendType_detached"  class="type-btn active" onclick="setTrendType('detached')">🏠 Detached</button>
+      <button id="trendType_townhouse" class="type-btn"        onclick="setTrendType('townhouse')">🏘️ Townhouse</button>
+      <button id="trendType_condo"     class="type-btn"        onclick="setTrendType('condo')">🏢 Condo / Apt</button>
+    </div>
+
+    <!-- City tabs -->
+    <div id="cityTabs" class="trend-tabs-wrap" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem;"></div>
+
+    <!-- Stats grid -->
+    <div id="cityStats" class="stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem;"></div>
+
+    <!-- Chart -->
+    <div style="position:relative;height:320px;"><canvas id="trendChart"></canvas></div>
+
+    <p style="font-size:0.73rem;color:#94a3b8;margin-top:0.75rem;">
+      Canadian prices in CAD. US prices in USD. Data represents benchmark/median prices; individual transactions vary. Average prices estimated at median ×1.08. Chart shows all three property types simultaneously; selected type is highlighted.
+    </p>
   </div>
 
   <!-- More Tools -->
@@ -356,6 +404,7 @@
 </footer>
 
 <script>
+  /* ─── MORTGAGE CALCULATOR ─── */
   let country = 'CA';
 
   function setCountry(c) {
@@ -483,12 +532,12 @@
       type: 'doughnut',
       data: {
         labels: ['Principal', 'Total Interest'],
-        datasets: [{ data: [principal, totalInterest], backgroundColor: ['#4ade80','#fbbf24'], borderWidth: 0 }]
+        datasets: [{ data: [principal, totalInterest], backgroundColor: ['#4ade80','#fbbf24'], borderWidth: 0, hoverOffset: 6 }]
       },
       options: {
         maintainAspectRatio: false, cutout: '68%',
         plugins: {
-          legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } },
+          legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16, usePointStyle: true } },
           tooltip: { callbacks: { label: ctx => ' $' + Math.round(ctx.raw).toLocaleString('en-CA') } }
         }
       }
@@ -500,26 +549,34 @@
       data: {
         labels: yearLabels,
         datasets: [
-          { type:'bar',  label:'Interest',  data:yearInterests,  backgroundColor:'#fbbf24', stack:'a', yAxisID:'bars', order:2 },
-          { type:'bar',  label:'Principal', data:yearPrincipals, backgroundColor:'#4ade80', stack:'a', yAxisID:'bars', order:2 },
+          { type:'bar',  label:'Interest',  data:yearInterests,  backgroundColor:'#fbbf24cc', stack:'a', yAxisID:'bars', order:2 },
+          { type:'bar',  label:'Principal', data:yearPrincipals, backgroundColor:'#4ade80cc', stack:'a', yAxisID:'bars', order:2 },
           { type:'line', label:'Balance',   data:yearBalances,   borderColor:'#1e293b', borderWidth:2.5, pointRadius:0, tension:0.4, yAxisID:'line', order:1 }
         ]
       },
       options: {
         maintainAspectRatio: false,
         plugins: {
-          legend: { position:'top', labels: { font:{ size:12 }, padding:12, boxWidth:12 } },
+          legend: { position:'top', labels: { font:{ size:11 }, padding:12, boxWidth:12, usePointStyle:true } },
           tooltip: { callbacks: { label: ctx => ' $' + Math.round(ctx.raw).toLocaleString('en-CA') } }
         },
         scales: {
-          x:    { stacked:true, grid:{display:false}, ticks:{ maxTicksLimit:8, font:{size:11} } },
-          bars: { type:'linear', position:'left',  stacked:true, grid:{color:'#f1f5f9'}, ticks:{ callback: v => '$'+(v>=1000?(v/1000).toFixed(0)+'k':v), font:{size:11} } },
-          line: { type:'linear', position:'right', grid:{display:false}, ticks:{ callback: v => '$'+(v>=1000?(v/1000).toFixed(0)+'k':v), font:{size:11} } }
+          x:    { stacked:true, grid:{display:false}, ticks:{ maxTicksLimit:8, font:{size:10} } },
+          bars: { type:'linear', position:'left',  stacked:true, grid:{color:'#f1f5f9'}, ticks:{ callback: v => '$'+(v>=1000?(v/1000).toFixed(0)+'k':v), font:{size:10} } },
+          line: { type:'linear', position:'right', grid:{display:false}, ticks:{ callback: v => '$'+(v>=1000?(v/1000).toFixed(0)+'k':v), font:{size:10} } }
         }
       }
     });
+  }
 
-    document.getElementById('chartsCard').style.display = 'block';
+  function toggleAmort() {
+    const wrap = document.getElementById('amortTableWrap');
+    const btn  = document.getElementById('amortToggleBtn');
+    const open = wrap.style.display === 'none';
+    wrap.style.display = open ? 'block' : 'none';
+    btn.querySelector('.arrow').style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+    btn.textContent = '';
+    btn.innerHTML = (open ? 'Hide table ' : 'Show table ') + '<span class="arrow" style="transition:transform 0.2s;display:inline-block;transform:' + (open?'rotate(180deg)':'rotate(0deg)') + '">▾</span>';
   }
 
   function buildAmortization(principal, mRate, n, monthlyPI) {
@@ -550,86 +607,216 @@
     updateCharts(principal, (monthlyPI*n)-principal, yearLabels, yearBalances, yearPrincipals, yearInterests);
   }
 
-  const trendData = {
-    Vancouver:{ color:'#2563eb', prices:[820,900,1030,1050,990,1030,1230,1360,1200,1180,1200] },
-    Toronto:  { color:'#7c3aed', prices:[620,730,820,790,820,930,1095,1190,1050,1070,1050] },
-    Calgary:  { color:'#d97706', prices:[450,430,440,450,430,430,480,530,560,590,590] },
-    Ottawa:   { color:'#059669', prices:[360,380,400,420,450,520,660,700,630,650,650] },
-    Montréal: { color:'#dc2626', prices:[310,320,330,350,390,450,520,560,530,550,550] },
-    Edmonton: { color:'#0891b2', prices:[370,350,360,360,350,350,380,400,410,430,430] },
+  /* ─── HOME PRICE TRENDS ─── */
+  const TREND_YEARS = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+
+  // Canadian cities — detached benchmark prices in CAD $k
+  // condo and townhouse derived via per-city multipliers (condoF / townF)
+  const CA_DATA = {
+    'Vancouver':     { color:'#2563eb', condoF:0.55, townF:0.78, d:[820,900,1030,1050,990,1030,1230,1360,1200,1180,1200] },
+    'Toronto':       { color:'#7c3aed', condoF:0.52, townF:0.74, d:[620,730,820,790,820,930,1095,1190,1050,1070,1050] },
+    'Calgary':       { color:'#d97706', condoF:0.52, townF:0.72, d:[450,430,440,450,430,430,480,530,560,590,600] },
+    'Ottawa':        { color:'#059669', condoF:0.60, townF:0.80, d:[360,380,400,420,450,520,660,700,630,650,660] },
+    'Montréal':      { color:'#dc2626', condoF:0.67, townF:0.84, d:[310,320,330,350,390,450,520,560,530,550,560] },
+    'Edmonton':      { color:'#0891b2', condoF:0.54, townF:0.72, d:[370,350,360,360,350,350,380,400,410,430,440] },
+    'Victoria':      { color:'#7c3aed', condoF:0.60, townF:0.77, d:[550,620,730,730,700,740,870,960,820,840,850] },
+    'Hamilton':      { color:'#b45309', condoF:0.57, townF:0.77, d:[400,430,500,490,490,560,760,850,700,720,730] },
+    'Kitchener-W':   { color:'#16a34a', condoF:0.57, townF:0.78, d:[320,350,410,410,420,490,700,770,610,650,660] },
+    'Halifax':       { color:'#9333ea', condoF:0.74, townF:0.86, d:[250,255,265,270,285,330,460,510,470,490,500] },
+    'Winnipeg':      { color:'#0369a1', condoF:0.62, townF:0.80, d:[290,295,300,305,310,320,360,380,360,370,380] },
+    'Saskatoon':     { color:'#c2410c', condoF:0.56, townF:0.76, d:[320,310,305,300,295,290,310,330,330,345,355] },
+    'London ON':     { color:'#047857', condoF:0.58, townF:0.78, d:[270,285,310,315,340,400,560,620,500,530,545] },
+    'Québec City':   { color:'#b91c1c', condoF:0.72, townF:0.86, d:[230,235,240,250,265,295,360,390,375,390,400] },
   };
-  const trendYears = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+
+  // US cities — median home prices in USD $k
+  const US_DATA = {
+    'New York':      { color:'#1d4ed8', condoF:0.70, townF:0.85, d:[380,395,415,430,450,470,520,560,540,550,560] },
+    'Los Angeles':   { color:'#7c3aed', condoF:0.62, townF:0.78, d:[520,570,620,650,660,700,800,880,810,830,840] },
+    'San Francisco': { color:'#b45309', condoF:0.68, townF:0.82, d:[680,780,880,960,950,980,1100,1200,1050,1100,1080] },
+    'Seattle':       { color:'#059669', condoF:0.64, townF:0.80, d:[420,480,560,620,600,650,780,870,760,780,800] },
+    'Miami':         { color:'#dc2626', condoF:0.66, townF:0.82, d:[280,310,340,365,380,420,530,620,590,620,630] },
+    'Austin':        { color:'#0891b2', condoF:0.60, townF:0.78, d:[280,310,340,370,400,460,570,650,530,520,540] },
+    'Chicago':       { color:'#4f46e5', condoF:0.67, townF:0.83, d:[230,245,260,270,280,295,330,355,340,350,360] },
+    'Denver':        { color:'#c2410c', condoF:0.62, townF:0.80, d:[330,370,410,450,460,490,570,620,560,570,590] },
+    'Phoenix':       { color:'#9333ea', condoF:0.64, townF:0.80, d:[215,240,265,280,290,340,450,510,450,460,480] },
+    'Boston':        { color:'#047857', condoF:0.66, townF:0.82, d:[390,420,460,490,510,545,620,670,630,660,680] },
+    'Dallas':        { color:'#b91c1c', condoF:0.58, townF:0.78, d:[240,270,300,320,340,380,460,520,470,480,500] },
+    'Nashville':     { color:'#0369a1', condoF:0.62, townF:0.80, d:[230,255,285,310,330,380,470,530,480,490,510] },
+    'Portland OR':   { color:'#16a34a', condoF:0.63, townF:0.79, d:[310,350,400,430,420,450,510,560,510,520,530] },
+    'San Diego':     { color:'#d97706', condoF:0.64, townF:0.80, d:[490,530,580,620,630,680,790,870,810,840,860] },
+    'Minneapolis':   { color:'#6d28d9', condoF:0.65, townF:0.82, d:[220,240,260,275,285,305,350,380,360,370,380] },
+  };
+
+  let trendCountry = 'CA';
+  let trendType = 'detached';
+  let activeCityCA = 'Vancouver';
+  let activeCityUS = 'New York';
   let trendInst = null;
 
-  function renderTrend(city) {
-    const d = trendData[city];
-    const prices = d.prices;
-    const current = prices[prices.length-1];
-    const base = prices[0];
-    const peak = Math.max(...prices);
-    const peakYear = trendYears[prices.indexOf(peak)];
-    const change = ((current-base)/base*100).toFixed(0);
+  function getTypeData(cityData, type) {
+    if (type === 'condo')     return cityData.d.map(p => Math.round(p * cityData.condoF * 10) / 10);
+    if (type === 'townhouse') return cityData.d.map(p => Math.round(p * cityData.townF  * 10) / 10);
+    return cityData.d;
+  }
+
+  function setTrendCountry(c) {
+    trendCountry = c;
+    document.getElementById('trendBtnCA').classList.toggle('active', c === 'CA');
+    document.getElementById('trendBtnUS').classList.toggle('active', c === 'US');
+    renderCityTabs();
+    renderTrend();
+  }
+
+  function setTrendType(t) {
+    trendType = t;
+    ['detached','townhouse','condo'].forEach(x => {
+      document.getElementById('trendType_' + x).classList.toggle('active', x === t);
+    });
+    renderTrend();
+  }
+
+  function renderCityTabs() {
+    const data = trendCountry === 'CA' ? CA_DATA : US_DATA;
+    const active = trendCountry === 'CA' ? activeCityCA : activeCityUS;
+    const tabs = document.getElementById('cityTabs');
+    tabs.innerHTML = '';
+    Object.keys(data).forEach(city => {
+      const btn = document.createElement('button');
+      btn.className = 'trend-tab';
+      btn.dataset.city = city;
+      btn.textContent = city;
+      const isActive = city === active;
+      const color = data[city].color;
+      btn.style.background    = isActive ? color : '#f8fafc';
+      btn.style.color         = isActive ? '#fff' : '#475569';
+      btn.style.borderColor   = isActive ? color : '#e2e8f0';
+      btn.onclick = () => {
+        if (trendCountry === 'CA') activeCityCA = city;
+        else activeCityUS = city;
+        renderCityTabs();
+        renderTrend();
+      };
+      tabs.appendChild(btn);
+    });
+  }
+
+  function renderTrend() {
+    const data = trendCountry === 'CA' ? CA_DATA : US_DATA;
+    const cityName = trendCountry === 'CA' ? activeCityCA : activeCityUS;
+    const c = data[cityName];
+    const curr = trendCountry === 'CA' ? 'CAD' : 'USD';
+    const locale = trendCountry === 'CA' ? 'en-CA' : 'en-US';
+
+    const detPrices  = c.d;
+    const townPrices = getTypeData(c, 'townhouse');
+    const condPrices = getTypeData(c, 'condo');
+    const activePrices = trendType === 'condo' ? condPrices : trendType === 'townhouse' ? townPrices : detPrices;
+
+    const current     = activePrices[activePrices.length - 1];
+    const oneYrAgo    = activePrices[activePrices.length - 2];
+    const fiveYrAgo   = activePrices[activePrices.length - 6];
+    const tenYrAgo    = activePrices[0];
+    const avgPrice    = Math.round(current * 1.08 * 10) / 10;
+    const peak        = Math.max(...activePrices);
+    const peakYear    = TREND_YEARS[activePrices.indexOf(peak)];
+    const yoy         = ((current - oneYrAgo)  / oneYrAgo  * 100).toFixed(1);
+    const fiveYr      = ((current - fiveYrAgo) / fiveYrAgo * 100).toFixed(1);
+    const tenYr       = ((current - tenYrAgo)  / tenYrAgo  * 100).toFixed(1);
+    const pctBelowPeak = current < peak ? (((peak - current) / peak) * 100).toFixed(1) : null;
+
+    const fmtP   = v => '$' + (v * 1000).toLocaleString(locale) + ' ' + curr;
+    const fmtPct = v => (parseFloat(v) >= 0 ? '+' : '') + v + '%';
+    const pctClr = v => parseFloat(v) >= 0 ? '#059669' : '#dc2626';
 
     document.getElementById('cityStats').innerHTML = `
-      <div style="background:#f8fafc;border-radius:10px;padding:1rem;text-align:center;">
-        <div style="font-size:1.3rem;font-weight:800;color:#1e293b;">$${(current*1000).toLocaleString('en-CA')}</div>
-        <div style="font-size:0.78rem;color:#64748b;margin-top:0.2rem;">2025 avg price</div>
+      <div class="stat-box">
+        <div class="stat-val">${fmtP(current)}</div>
+        <div class="stat-lbl">Median price (2025)</div>
       </div>
-      <div style="background:#f8fafc;border-radius:10px;padding:1rem;text-align:center;">
-        <div style="font-size:1.3rem;font-weight:800;color:#1e293b;">$${(peak*1000).toLocaleString('en-CA')}</div>
-        <div style="font-size:0.78rem;color:#64748b;margin-top:0.2rem;">Peak (${peakYear})</div>
+      <div class="stat-box">
+        <div class="stat-val">${fmtP(avgPrice)}</div>
+        <div class="stat-lbl">Average price (est.)</div>
       </div>
-      <div style="background:#f8fafc;border-radius:10px;padding:1rem;text-align:center;">
-        <div style="font-size:1.3rem;font-weight:800;color:${change>=0?'#059669':'#dc2626'};">${change>=0?'+':''}${change}%</div>
-        <div style="font-size:0.78rem;color:#64748b;margin-top:0.2rem;">Since 2015</div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:${pctClr(yoy)}">${fmtPct(yoy)}</div>
+        <div class="stat-lbl">Year-over-year change</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:${pctClr(fiveYr)}">${fmtPct(fiveYr)}</div>
+        <div class="stat-lbl">5-year change</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:${pctClr(tenYr)}">${fmtPct(tenYr)}</div>
+        <div class="stat-lbl">10-year change (since 2015)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:${pctBelowPeak ? '#dc2626' : '#059669'}">${pctBelowPeak ? '−' + pctBelowPeak + '%' : 'All-time high'}</div>
+        <div class="stat-lbl">${pctBelowPeak ? 'Below ' + peakYear + ' peak (' + fmtP(peak) + ')' : 'Peak: ' + peakYear}</div>
       </div>`;
 
-    document.querySelectorAll('.trend-tab').forEach(btn => {
-      const active = btn.dataset.city === city;
-      btn.style.background = active ? d.color : '#f1f5f9';
-      btn.style.color = active ? '#fff' : '#475569';
-      btn.style.borderColor = active ? d.color : '#e2e8f0';
-    });
-
+    // Chart: three lines, selected type highlighted
     const ctx = document.getElementById('trendChart').getContext('2d');
     if (trendInst) trendInst.destroy();
+
+    const lineStyle = (type, prices) => {
+      const active = trendType === type;
+      const dash   = type === 'condo' ? [3,3] : type === 'townhouse' ? [7,4] : [];
+      const alpha  = active ? 'ff' : '66';
+      return {
+        label: type.charAt(0).toUpperCase() + type.slice(1),
+        data: prices,
+        borderColor: c.color + alpha,
+        backgroundColor: active ? c.color + '18' : 'transparent',
+        fill: active,
+        borderWidth: active ? 3 : 1.5,
+        pointRadius: active ? 4 : 0,
+        pointHoverRadius: 5,
+        tension: 0.4,
+        borderDash: dash,
+      };
+    };
+
     trendInst = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: trendYears,
-        datasets: [{ label: city+' avg price ($k)', data: prices, borderColor: d.color,
-          backgroundColor: d.color+'18', fill:true, tension:0.4, pointRadius:4,
-          pointBackgroundColor: d.color, borderWidth:2.5 }]
+        labels: TREND_YEARS,
+        datasets: [
+          lineStyle('detached',  detPrices),
+          lineStyle('townhouse', townPrices),
+          lineStyle('condo',     condPrices),
+        ]
       },
       options: {
         maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ' $'+(ctx.raw*1000).toLocaleString('en-CA') } }
+          legend: {
+            display: true, position: 'top',
+            labels: { font:{ size:12 }, boxWidth:24, padding:16, usePointStyle:true }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: $${(ctx.raw * 1000).toLocaleString(locale)} ${curr}`
+            }
+          }
         },
         scales: {
-          x: { grid:{display:false}, ticks:{font:{size:11}} },
-          y: { grid:{color:'#f1f5f9'}, ticks:{callback: v => '$'+v+'k', font:{size:11}} }
+          x: { grid:{ display:false }, ticks:{ font:{ size:11 } } },
+          y: {
+            grid: { color:'#f1f5f9' },
+            ticks: { callback: v => '$' + v + 'k', font:{ size:11 } }
+          }
         }
       }
     });
   }
 
-  function initTrend() {
-    const tabs = document.getElementById('cityTabs');
-    Object.keys(trendData).forEach(city => {
-      const btn = document.createElement('button');
-      btn.className = 'trend-tab';
-      btn.dataset.city = city;
-      btn.textContent = city;
-      btn.style.cssText = 'padding:0.35rem 0.75rem;border-radius:999px;border:1px solid #e2e8f0;background:#f1f5f9;color:#475569;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;';
-      btn.onclick = () => renderTrend(city);
-      tabs.appendChild(btn);
-    });
-    renderTrend('Vancouver');
-  }
-
-  window.addEventListener('load', () => { setCountry('CA'); initTrend(); });
+  window.addEventListener('load', () => {
+    setCountry('CA');
+    renderCityTabs();
+    renderTrend();
+  });
 </script>
 
 </body>
