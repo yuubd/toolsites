@@ -29,17 +29,21 @@
     .stat-lbl  { font-size:0.73rem; color:#64748b; margin-top:0.2rem; }
     .type-btn  { padding:0.4rem 1rem; border-radius:999px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#475569; font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
     .type-btn.active { background:#1e293b; color:#fff; border-color:#1e293b; }
-    .trend-tab { padding:0.35rem 0.7rem; border-radius:999px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#475569; font-size:0.76rem; font-weight:600; cursor:pointer; transition:all 0.12s; white-space:nowrap; }
     .amort-toggle { display:flex; align-items:center; gap:0.5rem; background:none; border:1.5px solid #e2e8f0; border-radius:8px; padding:0.4rem 0.9rem; font-size:0.85rem; font-weight:600; color:#475569; cursor:pointer; transition:all 0.15s; }
     .amort-toggle:hover { background:#f1f5f9; }
     .amort-toggle .arrow { transition:transform 0.2s; display:inline-block; }
     .amort-toggle.open .arrow { transform:rotate(180deg); }
     .country-tab { padding:0.45rem 1.1rem; border-radius:8px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#475569; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.15s; }
     .country-tab.active { background:#2563eb; color:#fff; border-color:#2563eb; }
+    .cmp-chip { display:inline-flex; align-items:center; gap:0.5rem; padding:0.4rem 0.8rem; border:1.5px solid #e2e8f0; border-radius:999px; background:#fff; font-size:0.85rem; font-weight:600; color:#1e293b; }
+    .cmp-x { cursor:pointer; color:#94a3b8; font-size:0.72rem; margin-left:0.1rem; line-height:1; }
+    .cmp-x:hover { color:#dc2626; }
+    .city-opt { display:flex; align-items:center; justify-content:space-between; padding:0.55rem 1rem; font-size:0.88rem; color:#1e293b; cursor:pointer; }
+    .city-opt:hover { background:#f1f5f9; }
+    .city-opt.on { background:#f0fdf4; }
     @media (max-width:640px) {
       .chart-grid { grid-template-columns:1fr !important; }
       .stats-grid { grid-template-columns:repeat(2,1fr) !important; }
-      .trend-tabs-wrap { gap:0.3rem !important; }
     }
   </style>
 </head>
@@ -248,17 +252,35 @@
       <button id="trendType_condo"     class="type-btn"        onclick="setTrendType('condo')">🏢 Condo / Apt</button>
     </div>
 
-    <!-- City tabs -->
-    <div id="cityTabs" class="trend-tabs-wrap" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem;"></div>
+    <!-- Time-range filter -->
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+      <span style="font-size:0.8rem;color:#64748b;font-weight:600;margin-right:0.15rem;">Range</span>
+      <button id="trendRange_10" class="type-btn active" onclick="setTrendRange(10)">10Y</button>
+      <button id="trendRange_15" class="type-btn"        onclick="setTrendRange(15)">15Y</button>
+      <button id="trendRange_20" class="type-btn"        onclick="setTrendRange(20)">20Y</button>
+      <button id="trendRange_25" class="type-btn"        onclick="setTrendRange(25)">25Y</button>
+    </div>
 
-    <!-- Stats grid -->
-    <div id="cityStats" class="stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem;"></div>
+    <!-- City selector: search + selected chips (compare mode) -->
+    <div style="margin-bottom:1.25rem;">
+      <div style="position:relative;max-width:360px;margin-bottom:0.9rem;">
+        <span style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.9rem;pointer-events:none;">🔍</span>
+        <input id="citySearch" type="text" autocomplete="off" placeholder="Search cities to compare…"
+          oninput="onCitySearch()" onfocus="onCitySearch()"
+          style="width:100%;padding:0.6rem 0.9rem 0.6rem 2.4rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.9rem;color:#1e293b;background:#fff;">
+        <div id="cityMenu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;max-height:260px;overflow-y:auto;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:50;"></div>
+      </div>
+      <div id="selectedChips" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+    </div>
+
+    <!-- Stats (1 city) / comparison table (2+ cities) -->
+    <div id="cityStats" style="margin-bottom:1.5rem;"></div>
 
     <!-- Chart -->
-    <div style="position:relative;height:320px;"><canvas id="trendChart"></canvas></div>
+    <div style="position:relative;height:340px;"><canvas id="trendChart"></canvas></div>
 
     <p style="font-size:0.73rem;color:#94a3b8;margin-top:0.75rem;">
-      Canadian prices in CAD. US prices in USD. Data represents benchmark/median prices; individual transactions vary. Average prices estimated at median ×1.08. Chart shows all three property types simultaneously; selected type is highlighted.
+      Canadian prices in CAD, US prices in USD. Benchmark/median estimates; individual transactions vary. Select one city to see all three property types; add up to 5 cities to compare a single type side-by-side. Monthly points are interpolated between annual benchmarks, and pre-2015 values are back-projected from a national benchmark index. Average estimated at median ×1.08.
     </p>
   </div>
 
@@ -608,7 +630,31 @@
   }
 
   /* ─── HOME PRICE TRENDS ─── */
-  const TREND_YEARS = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+  // City arrays hold 2015–2025 annual values; pre-2015 is back-projected from each
+  // city's 2015 value using a national benchmark index (see HIST_IDX). Annual anchors
+  // are then interpolated to MONTHLY points so the chart reads smooth and granular.
+  const MPY = 12;
+  const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // Monthly axis labels: Jan 2000 … Jan 2025 (26 annual anchors → 25×12 + 1 = 301 points)
+  const FULL_MONTHS = Array.from({ length: 25 * MPY + 1 }, (_, k) =>
+    MONTH_ABBR[k % MPY] + ' ' + (2000 + Math.floor(k / MPY)));
+
+  // Linear-interpolate an annual series into monthly points (anchors land on January)
+  function toMonthly(annual) {
+    const out = [];
+    for (let i = 0; i < annual.length - 1; i++) {
+      const a = annual[i], b = annual[i + 1];
+      for (let m = 0; m < MPY; m++) out.push(Math.round((a + (b - a) * (m / MPY)) * 10) / 10);
+    }
+    out.push(Math.round(annual[annual.length - 1] * 10) / 10);
+    return out;
+  }
+  // Broad national price index 2000–2014, normalized so 2015 = 1.00.
+  // Captures the 2000s run-up, 2008–09 pullback (deeper in the US), then recovery.
+  const HIST_IDX = {
+    CA: [0.33,0.35,0.39,0.44,0.50,0.56,0.62,0.68,0.70,0.68,0.75,0.80,0.84,0.88,0.94],
+    US: [0.58,0.62,0.67,0.73,0.82,0.92,0.98,0.96,0.85,0.76,0.74,0.72,0.76,0.85,0.93],
+  };
 
   // Canadian cities — detached benchmark prices in CAD $k
   // condo and townhouse derived via per-city multipliers (condoF / townF)
@@ -627,6 +673,20 @@
     'Saskatoon':     { color:'#c2410c', condoF:0.56, townF:0.76, d:[320,310,305,300,295,290,310,330,330,345,355] },
     'London ON':     { color:'#047857', condoF:0.58, townF:0.78, d:[270,285,310,315,340,400,560,620,500,530,545] },
     'Québec City':   { color:'#b91c1c', condoF:0.72, townF:0.86, d:[230,235,240,250,265,295,360,390,375,390,400] },
+    'Kelowna':       { color:'#0d9488', condoF:0.58, townF:0.78, d:[520,560,640,680,690,740,920,1010,880,900,915] },
+    'Abbotsford':    { color:'#4338ca', condoF:0.60, townF:0.80, d:[520,600,720,760,730,780,980,1080,940,960,975] },
+    'Barrie':        { color:'#be123c', condoF:0.62, townF:0.80, d:[420,460,540,530,540,620,850,920,760,790,800] },
+    'Guelph':        { color:'#0e7490', condoF:0.60, townF:0.79, d:[420,460,520,530,560,640,850,920,780,810,825] },
+    'Kingston':      { color:'#7e22ce', condoF:0.62, townF:0.81, d:[300,315,340,360,390,460,620,680,590,620,635] },
+    'Windsor':       { color:'#a16207', condoF:0.60, townF:0.79, d:[230,250,300,320,360,430,620,680,560,590,600] },
+    'Nanaimo':       { color:'#15803d', condoF:0.63, townF:0.81, d:[370,410,480,520,540,590,760,840,730,750,765] },
+    'Kamloops':      { color:'#c026d3', condoF:0.60, townF:0.79, d:[370,395,440,470,480,520,660,730,650,670,685] },
+    'Sudbury':      { color:'#0891b2', condoF:0.62, townF:0.80, d:[240,250,260,270,290,340,460,510,470,490,500] },
+    'Regina':        { color:'#e11d48', condoF:0.60, townF:0.79, d:[315,320,315,310,305,300,330,350,345,355,365] },
+    'St. John\'s':   { color:'#2563eb', condoF:0.66, townF:0.83, d:[300,300,295,290,285,285,310,330,340,360,375] },
+    'Sherbrooke':    { color:'#65a30d', condoF:0.72, townF:0.85, d:[220,225,230,240,255,290,380,420,410,430,445] },
+    'Moncton':       { color:'#9333ea', condoF:0.70, townF:0.84, d:[175,178,182,186,195,225,320,370,380,410,430] },
+    'Red Deer':      { color:'#ea580c', condoF:0.58, townF:0.76, d:[340,330,325,320,310,305,330,350,355,365,375] },
   };
 
   // US cities — median home prices in USD $k
@@ -646,167 +706,293 @@
     'Portland OR':   { color:'#16a34a', condoF:0.63, townF:0.79, d:[310,350,400,430,420,450,510,560,510,520,530] },
     'San Diego':     { color:'#d97706', condoF:0.64, townF:0.80, d:[490,530,580,620,630,680,790,870,810,840,860] },
     'Minneapolis':   { color:'#6d28d9', condoF:0.65, townF:0.82, d:[220,240,260,275,285,305,350,380,360,370,380] },
+    'San Jose':      { color:'#1e40af', condoF:0.66, townF:0.82, d:[850,950,1080,1150,1120,1180,1400,1500,1300,1380,1450] },
+    'Sacramento':    { color:'#be185d', condoF:0.62, townF:0.80, d:[300,340,385,420,435,470,570,630,570,585,605] },
+    'Washington DC': { color:'#0d9488', condoF:0.68, townF:0.83, d:[380,400,420,440,455,485,560,610,585,610,630] },
+    'Atlanta':       { color:'#b45309', condoF:0.62, townF:0.80, d:[200,220,240,255,270,300,370,420,390,405,420] },
+    'Houston':       { color:'#7c3aed', condoF:0.60, townF:0.79, d:[200,215,230,240,250,270,320,360,345,355,370] },
+    'San Antonio':   { color:'#c2410c', condoF:0.60, townF:0.79, d:[190,205,220,235,250,275,330,375,355,360,370] },
+    'Philadelphia':  { color:'#0369a1', condoF:0.64, townF:0.82, d:[200,210,225,235,250,275,320,355,350,365,380] },
+    'Charlotte':     { color:'#15803d', condoF:0.62, townF:0.80, d:[200,220,245,265,285,320,400,460,430,450,470] },
+    'Raleigh':       { color:'#4338ca', condoF:0.63, townF:0.81, d:[230,250,270,290,310,350,440,510,470,485,505] },
+    'Tampa':         { color:'#dc2626', condoF:0.64, townF:0.81, d:[180,205,230,255,275,310,410,480,450,465,480] },
+    'Orlando':       { color:'#0891b2', condoF:0.64, townF:0.81, d:[190,215,240,265,285,320,410,470,440,455,470] },
+    'Las Vegas':     { color:'#9333ea', condoF:0.63, townF:0.80, d:[220,250,285,305,315,345,440,500,420,435,455] },
+    'Salt Lake City':{ color:'#ca8a04', condoF:0.62, townF:0.80, d:[280,310,345,380,400,440,550,620,540,555,575] },
+    'Columbus':      { color:'#e11d48', condoF:0.64, townF:0.82, d:[160,175,190,205,220,250,320,365,350,365,385] },
+    'Detroit':       { color:'#0e7490', condoF:0.66, townF:0.83, d:[130,145,165,180,195,220,290,330,315,330,350] },
+    'Pittsburgh':    { color:'#65a30d', condoF:0.66, townF:0.83, d:[140,150,160,170,180,200,250,280,270,280,295] },
   };
 
   let trendCountry = 'CA';
   let trendType = 'detached';
-  let activeCityCA = 'Vancouver';
-  let activeCityUS = 'New York';
+  let trendRange = 10;                  // years shown on the chart (10/15/20/25)
+  let selectedCA = ['Vancouver', 'Toronto', 'Calgary'];
+  let selectedUS = ['New York', 'Los Angeles', 'Austin'];
   let trendInst = null;
+  const MAX_COMPARE = 5;
+  // Distinct palette assigned by selection order so compared lines never clash
+  const CMP_PALETTE = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed'];
 
-  function getTypeData(cityData, type) {
-    if (type === 'condo')     return cityData.d.map(p => Math.round(p * cityData.condoF * 10) / 10);
-    if (type === 'townhouse') return cityData.d.map(p => Math.round(p * cityData.townF  * 10) / 10);
-    return cityData.d;
+  function trendData()      { return trendCountry === 'CA' ? CA_DATA : US_DATA; }
+  function selection()      { return trendCountry === 'CA' ? selectedCA : selectedUS; }
+  function setSelection(a)  { if (trendCountry === 'CA') selectedCA = a; else selectedUS = a; }
+
+  // Full annual 2000–2025 detached series: pre-2015 back-projected from the 2015 value
+  function fullDetachedAnnual(cityData) {
+    const base = cityData.d[0];        // 2015 detached benchmark
+    const pre = HIST_IDX[trendCountry].map(f => Math.round(base * f));
+    return pre.concat(cityData.d);     // 15 + 11 = 26 annual points (2000–2025)
   }
 
+  // Monthly price series for a city + property type (301 points, 2000–2025)
+  function getTypeData(cityData, type) {
+    const annual = fullDetachedAnnual(cityData);
+    const typed = type === 'condo'     ? annual.map(p => p * cityData.condoF)
+                : type === 'townhouse' ? annual.map(p => p * cityData.townF)
+                : annual;
+    return toMonthly(typed);
+  }
+
+  // Slice a full monthly series (or the month axis) to the selected range in years
+  function sliceRange(arr) { return arr.slice(arr.length - (trendRange * MPY + 1)); }
+  function rangeMonths()   { return sliceRange(FULL_MONTHS); }
+
   function setTrendCountry(c) {
+    if (trendCountry === c) return;
     trendCountry = c;
     document.getElementById('trendBtnCA').classList.toggle('active', c === 'CA');
     document.getElementById('trendBtnUS').classList.toggle('active', c === 'US');
-    renderCityTabs();
+    document.getElementById('citySearch').value = '';
+    closeCityMenu();
+    renderChips();
     renderTrend();
   }
 
   function setTrendType(t) {
     trendType = t;
-    ['detached','townhouse','condo'].forEach(x => {
+    ['detached', 'townhouse', 'condo'].forEach(x => {
       document.getElementById('trendType_' + x).classList.toggle('active', x === t);
     });
     renderTrend();
   }
 
-  function renderCityTabs() {
-    const data = trendCountry === 'CA' ? CA_DATA : US_DATA;
-    const active = trendCountry === 'CA' ? activeCityCA : activeCityUS;
-    const tabs = document.getElementById('cityTabs');
-    tabs.innerHTML = '';
-    Object.keys(data).forEach(city => {
-      const btn = document.createElement('button');
-      btn.className = 'trend-tab';
-      btn.dataset.city = city;
-      btn.textContent = city;
-      const isActive = city === active;
-      const color = data[city].color;
-      btn.style.background    = isActive ? color : '#f8fafc';
-      btn.style.color         = isActive ? '#fff' : '#475569';
-      btn.style.borderColor   = isActive ? color : '#e2e8f0';
-      btn.onclick = () => {
-        if (trendCountry === 'CA') activeCityCA = city;
-        else activeCityUS = city;
-        renderCityTabs();
-        renderTrend();
-      };
-      tabs.appendChild(btn);
+  function setTrendRange(r) {
+    trendRange = r;
+    [10, 15, 20, 25].forEach(x => {
+      document.getElementById('trendRange_' + x).classList.toggle('active', x === r);
+    });
+    renderTrend();
+  }
+
+  // Add/remove a city from the current country's comparison set (min 1, max 6)
+  function toggleCity(city) {
+    const sel = selection().slice();
+    const i = sel.indexOf(city);
+    if (i >= 0) {
+      if (sel.length === 1) return;
+      sel.splice(i, 1);
+    } else {
+      if (sel.length >= MAX_COMPARE) return;
+      sel.push(city);
+    }
+    setSelection(sel);
+    renderChips();
+    renderTrend();
+  }
+
+  // Removable pills for the currently-compared cities
+  function renderChips() {
+    const sel = selection();
+    const wrap = document.getElementById('selectedChips');
+    wrap.innerHTML = '';
+    sel.forEach((city, idx) => {
+      const color = CMP_PALETTE[idx % CMP_PALETTE.length];
+      const chip = document.createElement('span');
+      chip.className = 'cmp-chip';
+      chip.innerHTML =
+        `<span style="width:9px;height:9px;border-radius:50%;background:${color};display:inline-block;"></span>` +
+        `<span>${city}</span>` +
+        (sel.length > 1 ? '<span class="cmp-x" title="Remove">✕</span>' : '');
+      const x = chip.querySelector('.cmp-x');
+      if (x) x.addEventListener('click', () => toggleCity(city));
+      wrap.appendChild(chip);
     });
   }
 
+  // Searchable dropdown of every city in the current country
+  function onCitySearch() {
+    const q = document.getElementById('citySearch').value.trim().toLowerCase();
+    const menu = document.getElementById('cityMenu');
+    const sel = selection();
+    const matches = Object.keys(trendData()).filter(c => c.toLowerCase().includes(q));
+    if (!matches.length) {
+      menu.innerHTML = '<div style="padding:0.8rem 1rem;color:#94a3b8;font-size:0.85rem;">No cities found</div>';
+    } else {
+      const head = `<div style="padding:0.6rem 1rem 0.35rem;font-size:0.7rem;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;color:#94a3b8;">${trendCountry === 'CA' ? 'Canadian cities' : 'US cities'}</div>`;
+      menu.innerHTML = head + matches.map(c => {
+        const on = sel.includes(c);
+        const full = !on && sel.length >= MAX_COMPARE;
+        return `<div class="city-opt${on ? ' on' : ''}" data-city="${c}" style="${full ? 'opacity:0.4;pointer-events:none;' : ''}">` +
+                 `<span>${c}</span>` +
+                 `<span style="color:${on ? '#059669' : '#cbd5e1'};font-weight:700;">${on ? '✓' : '+'}</span>` +
+               '</div>';
+      }).join('');
+      menu.querySelectorAll('.city-opt').forEach(el => {
+        el.addEventListener('click', () => { toggleCity(el.dataset.city); onCitySearch(); });
+      });
+    }
+    menu.style.display = 'block';
+  }
+
+  function closeCityMenu() { document.getElementById('cityMenu').style.display = 'none'; }
+
+  // Close the dropdown when clicking anywhere outside it
+  document.addEventListener('click', (e) => {
+    const box = document.getElementById('citySearch');
+    const menu = document.getElementById('cityMenu');
+    if (!box || !menu) return;
+    if (!box.contains(e.target) && !menu.contains(e.target)) closeCityMenu();
+  });
+
+  // Compute the six headline stats for one price series
+  // Stats over the currently-visible monthly window (already range-sliced)
+  function cityStats(prices) {
+    const months    = rangeMonths();
+    const yearOf    = lbl => lbl.split(' ')[1];
+    const last      = prices.length - 1;
+    const current   = prices[last];
+    const oneYrAgo  = prices[last - MPY];
+    const fiveYrAgo = prices[last - 5 * MPY];
+    const startAgo  = prices[0];
+    const peak      = Math.max(...prices);
+    return {
+      current, peak,
+      peakYear:  yearOf(months[prices.indexOf(peak)]),
+      startYear: yearOf(months[0]),
+      avg:       Math.round(current * 1.08 * 10) / 10,
+      yoy:       ((current - oneYrAgo)  / oneYrAgo  * 100).toFixed(1),
+      fiveYr:    ((current - fiveYrAgo) / fiveYrAgo * 100).toFixed(1),
+      longChange:((current - startAgo)  / startAgo  * 100).toFixed(1),
+      belowPeak: current < peak ? (((peak - current) / peak) * 100).toFixed(1) : null,
+    };
+  }
+
   function renderTrend() {
-    const data = trendCountry === 'CA' ? CA_DATA : US_DATA;
-    const cityName = trendCountry === 'CA' ? activeCityCA : activeCityUS;
-    const c = data[cityName];
+    const data = trendData();
+    const sel = selection();
     const curr = trendCountry === 'CA' ? 'CAD' : 'USD';
     const locale = trendCountry === 'CA' ? 'en-CA' : 'en-US';
-
-    const detPrices  = c.d;
-    const townPrices = getTypeData(c, 'townhouse');
-    const condPrices = getTypeData(c, 'condo');
-    const activePrices = trendType === 'condo' ? condPrices : trendType === 'townhouse' ? townPrices : detPrices;
-
-    const current     = activePrices[activePrices.length - 1];
-    const oneYrAgo    = activePrices[activePrices.length - 2];
-    const fiveYrAgo   = activePrices[activePrices.length - 6];
-    const tenYrAgo    = activePrices[0];
-    const avgPrice    = Math.round(current * 1.08 * 10) / 10;
-    const peak        = Math.max(...activePrices);
-    const peakYear    = TREND_YEARS[activePrices.indexOf(peak)];
-    const yoy         = ((current - oneYrAgo)  / oneYrAgo  * 100).toFixed(1);
-    const fiveYr      = ((current - fiveYrAgo) / fiveYrAgo * 100).toFixed(1);
-    const tenYr       = ((current - tenYrAgo)  / tenYrAgo  * 100).toFixed(1);
-    const pctBelowPeak = current < peak ? (((peak - current) / peak) * 100).toFixed(1) : null;
-
     const fmtP   = v => '$' + (v * 1000).toLocaleString(locale) + ' ' + curr;
     const fmtPct = v => (parseFloat(v) >= 0 ? '+' : '') + v + '%';
     const pctClr = v => parseFloat(v) >= 0 ? '#059669' : '#dc2626';
+    const statsEl = document.getElementById('cityStats');
+    const months = rangeMonths();
 
-    document.getElementById('cityStats').innerHTML = `
-      <div class="stat-box">
-        <div class="stat-val">${fmtP(current)}</div>
-        <div class="stat-lbl">Median price (2025)</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val">${fmtP(avgPrice)}</div>
-        <div class="stat-lbl">Average price (est.)</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" style="color:${pctClr(yoy)}">${fmtPct(yoy)}</div>
-        <div class="stat-lbl">Year-over-year change</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" style="color:${pctClr(fiveYr)}">${fmtPct(fiveYr)}</div>
-        <div class="stat-lbl">5-year change</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" style="color:${pctClr(tenYr)}">${fmtPct(tenYr)}</div>
-        <div class="stat-lbl">10-year change (since 2015)</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" style="color:${pctBelowPeak ? '#dc2626' : '#059669'}">${pctBelowPeak ? '−' + pctBelowPeak + '%' : 'All-time high'}</div>
-        <div class="stat-lbl">${pctBelowPeak ? 'Below ' + peakYear + ' peak (' + fmtP(peak) + ')' : 'Peak: ' + peakYear}</div>
-      </div>`;
+    // Monthly price series for a city + type, sliced to the selected range
+    const seriesFor = (city, type) => sliceRange(getTypeData(data[city], type));
+    // Show a point only at each January (every 12th monthly index) — one dot per year
+    const yearDot = ctx => ctx.dataIndex % MPY === 0 ? 3 : 0;
 
-    // Chart: three lines, selected type highlighted
+    let datasets;
+
+    if (sel.length === 1) {
+      // Single city: three property-type lines, highlighted type solid + filled
+      const city = sel[0];
+      const s = cityStats(seriesFor(city, trendType));
+      statsEl.innerHTML = `
+        <div class="stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;">
+          <div class="stat-box"><div class="stat-val">${fmtP(s.current)}</div><div class="stat-lbl">Median price (2025)</div></div>
+          <div class="stat-box"><div class="stat-val">${fmtP(s.avg)}</div><div class="stat-lbl">Average price (est.)</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:${pctClr(s.yoy)}">${fmtPct(s.yoy)}</div><div class="stat-lbl">Year-over-year change</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:${pctClr(s.fiveYr)}">${fmtPct(s.fiveYr)}</div><div class="stat-lbl">5-year change</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:${pctClr(s.longChange)}">${fmtPct(s.longChange)}</div><div class="stat-lbl">${trendRange}-year change (since ${s.startYear})</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:${s.belowPeak ? '#dc2626' : '#059669'}">${s.belowPeak ? '−' + s.belowPeak + '%' : 'All-time high'}</div><div class="stat-lbl">${s.belowPeak ? 'Below ' + s.peakYear + ' peak (' + fmtP(s.peak) + ')' : 'Peak: ' + s.peakYear}</div></div>
+        </div>`;
+
+      const base = data[city].color;
+      const lineStyle = (type) => {
+        const on = trendType === type;
+        return {
+          label: type.charAt(0).toUpperCase() + type.slice(1),
+          data: seriesFor(city, type),
+          borderColor: base + (on ? 'ff' : '66'),
+          backgroundColor: on ? base + '18' : 'transparent',
+          fill: on,
+          borderWidth: on ? 3 : 1.5,
+          pointRadius: on ? yearDot : 0,
+          pointBackgroundColor: base,
+          pointBorderColor: base,
+          pointBorderWidth: 0,
+          pointHoverRadius: 5,
+          tension: 0.35,
+          borderDash: type === 'condo' ? [3,3] : type === 'townhouse' ? [7,4] : [],
+        };
+      };
+      datasets = [lineStyle('detached'), lineStyle('townhouse'), lineStyle('condo')];
+    } else {
+      // Multiple cities: one line per city + side-by-side comparison table
+      const rows = sel.map((city, idx) => {
+        const color = CMP_PALETTE[idx % CMP_PALETTE.length];
+        const s = cityStats(seriesFor(city, trendType));
+        return `<tr>
+          <td style="font-weight:600;white-space:nowrap;"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${color};margin-right:0.5rem;"></span>${city}</td>
+          <td style="white-space:nowrap;">${fmtP(s.current)}</td>
+          <td style="color:${pctClr(s.yoy)};font-weight:600;">${fmtPct(s.yoy)}</td>
+          <td style="color:${pctClr(s.fiveYr)};font-weight:600;">${fmtPct(s.fiveYr)}</td>
+          <td style="color:${pctClr(s.longChange)};font-weight:600;">${fmtPct(s.longChange)}</td>
+          <td>${s.belowPeak ? '−' + s.belowPeak + '%' : '—'}</td>
+        </tr>`;
+      }).join('');
+      statsEl.innerHTML = `
+        <div class="table-wrap" style="margin-top:0;">
+          <table>
+            <thead><tr><th>City</th><th>2025 price</th><th>YoY</th><th>5-yr</th><th>${trendRange}-yr</th><th>vs peak</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+
+      datasets = sel.map((city, idx) => {
+        const color = CMP_PALETTE[idx % CMP_PALETTE.length];
+        return {
+          label: city,
+          data: seriesFor(city, trendType),
+          borderColor: color,
+          backgroundColor: 'transparent',
+          fill: false,
+          borderWidth: 2.5,
+          pointRadius: yearDot,
+          pointBackgroundColor: color,
+          pointBorderColor: color,
+          pointBorderWidth: 0,
+          pointHoverRadius: 5,
+          tension: 0.35,
+        };
+      });
+    }
+
     const ctx = document.getElementById('trendChart').getContext('2d');
     if (trendInst) trendInst.destroy();
-
-    const lineStyle = (type, prices) => {
-      const active = trendType === type;
-      const dash   = type === 'condo' ? [3,3] : type === 'townhouse' ? [7,4] : [];
-      const alpha  = active ? 'ff' : '66';
-      return {
-        label: type.charAt(0).toUpperCase() + type.slice(1),
-        data: prices,
-        borderColor: c.color + alpha,
-        backgroundColor: active ? c.color + '18' : 'transparent',
-        fill: active,
-        borderWidth: active ? 3 : 1.5,
-        pointRadius: active ? 4 : 0,
-        pointHoverRadius: 5,
-        tension: 0.4,
-        borderDash: dash,
-      };
-    };
-
     trendInst = new Chart(ctx, {
       type: 'line',
-      data: {
-        labels: TREND_YEARS,
-        datasets: [
-          lineStyle('detached',  detPrices),
-          lineStyle('townhouse', townPrices),
-          lineStyle('condo',     condPrices),
-        ]
-      },
+      data: { labels: months, datasets },
       options: {
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: {
-            display: true, position: 'top',
-            labels: { font:{ size:12 }, boxWidth:24, padding:16, usePointStyle:true }
-          },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.dataset.label}: $${(ctx.raw * 1000).toLocaleString(locale)} ${curr}`
-            }
-          }
+          legend: { display: true, position: 'top', labels: { font:{ size:12 }, boxWidth:24, padding:16, usePointStyle:true } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: $${(ctx.raw * 1000).toLocaleString(locale)} ${curr}` } }
         },
         scales: {
-          x: { grid:{ display:false }, ticks:{ font:{ size:11 } } },
-          y: {
-            grid: { color:'#f1f5f9' },
-            ticks: { callback: v => '$' + v + 'k', font:{ size:11 } }
-          }
+          x: {
+            grid: { display: false },
+            ticks: {
+              font: { size: 11 }, maxRotation: 0, autoSkip: false,
+              // Monthly axis — show a tick label only at each January (the year)
+              callback: function (val) { const l = this.getLabelForValue(val); return l.slice(0, 3) === 'Jan' ? l.slice(4) : ''; }
+            }
+          },
+          y: { grid:{ color:'#f1f5f9' }, ticks:{ callback: v => '$' + v + 'k', font:{ size:11 } } }
         }
       }
     });
@@ -814,7 +1000,7 @@
 
   window.addEventListener('load', () => {
     setCountry('CA');
-    renderCityTabs();
+    renderChips();
     renderTrend();
   });
 </script>
