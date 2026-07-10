@@ -910,7 +910,7 @@
           <div class="stat-box"><div class="stat-val" style="color:${s.belowPeak ? '#dc2626' : '#059669'}">${s.belowPeak ? '−' + s.belowPeak + '%' : 'All-time high'}</div><div class="stat-lbl">${s.belowPeak ? 'Below ' + s.peakYear + ' peak (' + fmtP(s.peak) + ')' : 'Peak: ' + s.peakYear}</div></div>
         </div>`;
 
-      const base = data[city].color;
+      const base = CMP_PALETTE[0];   // match the selection chip color
       const lineStyle = (type) => {
         const on = trendType === type;
         return {
