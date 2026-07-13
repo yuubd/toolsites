@@ -284,3 +284,35 @@ footer {
 }
 .page-header h1 { font-size: 1.75rem; font-weight: 700; }
 .page-header p { color: #64748b; margin-top: 0.35rem; }
+
+/* ─── Mobile (shared, desktop untouched) ─── */
+@media (max-width: 640px) {
+  /* guard against any stray horizontal overflow */
+  body { overflow-x: hidden; }
+  img, svg, video { max-width: 100%; }
+  /* keep form controls (esp. selects with long option text) inside the viewport */
+  input, select, textarea, button { max-width: 100%; }
+
+  /* tighter gutters so content isn't squeezed on small screens */
+  .container { padding: 1.25rem 1rem; }
+  .card { padding: 1.25rem; border-radius: 10px; margin-bottom: 1.25rem; }
+
+  .page-header { padding: 1.5rem 1rem; }
+  .page-header h1 { font-size: 1.4rem; }
+  /* inner wrapper carries its own inline gutter — drop it on mobile */
+  .page-header > div { padding-left: 0 !important; padding-right: 0 !important; }
+
+  .tool-title { font-size: 1.4rem; }
+  .tool-subtitle { font-size: 0.9rem; }
+  .result-main { font-size: 1.6rem; }
+  .result-grid { gap: 0.75rem; }
+
+  .hero { padding: 2.5rem 1rem; }
+  .tool-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* tables stay inside their scroll wrappers but read smaller */
+  table { font-size: 0.82rem; }
+  th, td { padding: 0.5rem 0.6rem; }
+
+  .footer-inner { gap: 1.25rem; }
+}

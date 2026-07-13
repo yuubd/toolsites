@@ -54,6 +54,12 @@
     .converter-row input[type=time]:focus, .converter-row select:focus {
       outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
     }
+    @media (max-width: 640px) {
+      .converter-row { flex-direction: column; align-items: stretch; }
+      .converter-row input[type=time], .converter-row select { width: 100%; }
+      .converter-row > span { display: none; }
+      .clock-grid { grid-template-columns: 1fr; }
+    }
     .conv-result {
       background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px;
       padding: 1rem 1.25rem; margin-top: 1rem; font-size: 0.95rem; color: #1e293b;
