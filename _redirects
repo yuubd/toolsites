@@ -1,2 +1,4 @@
 # Redirect old /mortgage/ URL to homepage (calculator is now on homepage)
 /mortgage/   /   301
+# Phrasal verbs folded into the flashcards tool
+/phrasal-verbs/   /flashcards/   301

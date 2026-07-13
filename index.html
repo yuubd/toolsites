@@ -43,8 +43,13 @@
     .city-opt:hover { background:#f1f5f9; }
     .city-opt.on { background:#f0fdf4; }
     @media (max-width:640px) {
-      .chart-grid { grid-template-columns:1fr !important; }
-      .stats-grid { grid-template-columns:repeat(2,1fr) !important; }
+      .chart-grid { grid-template-columns:1fr !important; gap:1.25rem !important; }
+      .stats-grid { grid-template-columns:repeat(2,1fr) !important; gap:0.5rem !important; }
+      .stat-box { padding:0.7rem 0.8rem !important; }
+      .stat-val { font-size:0.98rem !important; }
+      .type-btn, .country-tab { font-size:0.8rem !important; padding:0.4rem 0.75rem !important; }
+      /* top Canada / US selector buttons */
+      #btnCA, #btnUS { font-size:0.9rem !important; padding:0.55rem 0.4rem !important; }
     }
   </style>
 </head>
@@ -372,13 +377,13 @@
         <div class="icon">🃏</div>
         <span class="badge" style="background:#fce7f3;color:#be185d">English</span>
         <h3>English Flashcards</h3>
-        <p>10 decks — everyday English, travel, beginner to advanced, phrasal verbs, idioms, and more.</p>
+        <p>10 decks — everyday English, travel, beginner to advanced, 100+ phrasal verbs, idioms, and more.</p>
       </a>
-      <a href="/phrasal-verbs/" class="tool-card">
-        <div class="icon">🔄</div>
-        <span class="badge" style="background:#fce7f3;color:#be185d">English</span>
-        <h3>Phrasal Verb Reference</h3>
-        <p>Browse 120+ phrasal verbs with definitions, examples, search, and a built-in quiz mode.</p>
+      <a href="/word-counter/" class="tool-card">
+        <div class="icon">📝</div>
+        <span class="badge" style="background:#e0f2fe;color:#0369a1">Writing</span>
+        <h3>Word Counter</h3>
+        <p>Live word, character, sentence, and paragraph counts with reading time — for essays, posts, and SEO.</p>
       </a>
       <a href="/json-formatter/" class="tool-card">
         <div class="icon">🔧</div>
@@ -408,7 +413,7 @@
       <a href="/bmi/">BMI Calculator</a>
       <a href="/world-clock/">World Clock</a>
       <a href="/flashcards/">English Flashcards</a>
-      <a href="/phrasal-verbs/">Phrasal Verbs</a>
+      <a href="/word-counter/">Word Counter</a>
       <a href="/json-formatter/">JSON Formatter</a>
       <a href="/zip/">ZIP / Unzip</a>
     </div>

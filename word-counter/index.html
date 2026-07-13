@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word Counter — Words, Characters &amp; Reading Time | G9 Toolkit</title>
+  <meta name="description" content="Free online word counter. Instantly count words, characters, sentences, paragraphs, and reading time as you type or paste. Nothing uploaded — runs in your browser." />
+  <meta property="og:title" content="Word Counter — Words, Characters &amp; Reading Time | G9 Toolkit" />
+  <meta property="og:description" content="Count words, characters, sentences, paragraphs, and reading time instantly. Free, private, no signup." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://g9toolkit.com/word-counter/" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%232563eb%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2216%22%20font-family%3D%22-apple-system%2CBlinkMacSystemFont%2CSegoe%20UI%2CRoboto%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22800%22%20letter-spacing%3D%22-1%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3EG9%3C%2Ftext%3E%3C%2Fsvg%3E" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Word Counter",
+    "description": "Free online word counter that counts words, characters, sentences, paragraphs, and reading time instantly in your browser.",
+    "url": "https://g9toolkit.com/word-counter/",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <style>
+    .wc-textarea {
+      width: 100%; min-height: 260px; padding: 1rem 1.1rem;
+      border: 1px solid #d1d5db; border-radius: 10px; font-size: 1rem;
+      line-height: 1.6; color: #1e293b; background: #fff; resize: vertical;
+      font-family: inherit;
+    }
+    .wc-textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .wc-toolbar { display: flex; gap: 0.6rem; margin-top: 0.75rem; flex-wrap: wrap; }
+    .wc-btn {
+      background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+      border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .wc-btn:hover { background: #e2e8f0; }
+    .wc-btn.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .wc-btn.primary:hover { background: #1d4ed8; }
+    .wc-stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem; margin-top: 1.25rem;
+    }
+    .wc-box { background: #f8fafc; border: 1px solid #eef2f7; border-radius: 10px; padding: 0.9rem 1rem; }
+    .wc-val { font-size: 1.5rem; font-weight: 800; color: #2563eb; line-height: 1.1; }
+    .wc-lbl { font-size: 0.75rem; color: #64748b; margin-top: 0.25rem; }
+    .wc-box.alt .wc-val { color: #1e293b; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+    <nav>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-header">
+  <div style="max-width:1100px; margin:0 auto; padding:0 1.5rem;">
+    <h1>Word Counter</h1>
+    <p>Count words, characters, sentences, paragraphs, and reading time — instantly, as you type.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="ad-slot ad-slot-banner"></div>
+
+  <div class="card">
+    <textarea class="wc-textarea" id="wc-input" placeholder="Type or paste your text here…" oninput="countText()" autofocus></textarea>
+    <div class="wc-toolbar">
+      <button class="wc-btn primary" onclick="copyText()" id="wc-copy">Copy text</button>
+      <button class="wc-btn" onclick="clearText()">Clear</button>
+    </div>
+
+    <div class="wc-stats" id="wc-stats">
+      <div class="wc-box"><div class="wc-val" id="s-words">0</div><div class="wc-lbl">Words</div></div>
+      <div class="wc-box alt"><div class="wc-val" id="s-chars">0</div><div class="wc-lbl">Characters</div></div>
+      <div class="wc-box alt"><div class="wc-val" id="s-chars-ns">0</div><div class="wc-lbl">Characters (no spaces)</div></div>
+      <div class="wc-box alt"><div class="wc-val" id="s-sentences">0</div><div class="wc-lbl">Sentences</div></div>
+      <div class="wc-box alt"><div class="wc-val" id="s-paragraphs">0</div><div class="wc-lbl">Paragraphs</div></div>
+      <div class="wc-box alt"><div class="wc-val" id="s-reading">0 sec</div><div class="wc-lbl">Reading time</div></div>
+      <div class="wc-box alt"><div class="wc-val" id="s-speaking">0 sec</div><div class="wc-lbl">Speaking time</div></div>
+      <div class="wc-box alt"><div class="wc-val" id="s-avg">0</div><div class="wc-lbl">Avg. word length</div></div>
+    </div>
+  </div>
+
+  <div class="ad-slot ad-slot-bottom"></div>
+
+  <!-- Educational content -->
+  <div class="card prose" style="margin-top:1.5rem;">
+    <h2>How the word counter works</h2>
+    <p>Everything runs entirely in your browser — your text is never uploaded to a server. As you type or paste, the counter recalculates instantly. <strong>Words</strong> are counted by splitting your text on spaces and line breaks; <strong>characters</strong> are counted both with and without spaces so you can meet strict limits like a Twitter/X post or an SMS message. <strong>Sentences</strong> are detected by terminal punctuation (. ! ?) and <strong>paragraphs</strong> by blank lines between blocks of text.</p>
+
+    <h2>Reading and speaking time</h2>
+    <p>Reading time assumes an average silent reading speed of about 200 words per minute, which is typical for adult readers of general-audience text. Speaking time assumes about 130 words per minute, a comfortable pace for presentations and voiceovers. Both are estimates — dense or technical material reads more slowly, and skimming reads faster.</p>
+
+    <h2>Why word count matters</h2>
+    <p>Many kinds of writing come with hard or soft length limits. Academic essays and assignments often specify a word range. Meta descriptions for SEO should stay near 150–160 characters. Social posts have strict character caps. Blog posts frequently target 1,000–2,000 words for search visibility. Knowing your counts as you write helps you hit the target without padding or cutting at the last minute.</p>
+
+    <h2>Tips for tighter writing</h2>
+    <ul>
+      <li>Cut filler phrases like "in order to" (use "to") and "due to the fact that" (use "because").</li>
+      <li>Prefer active voice — it usually needs fewer words and reads more directly.</li>
+      <li>Watch the average word length: consistently long words can signal overly complex phrasing.</li>
+      <li>Break long paragraphs up — shorter paragraphs improve readability on screens.</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
+      <p>Free online tools that run in your browser. No account needed.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Tools</h4>
+      <a href="/">Mortgage Calculator</a>
+      <a href="/bmi/">BMI Calculator</a>
+      <a href="/world-clock/">World Clock</a>
+      <a href="/flashcards/">English Flashcards</a>
+      <a href="/word-counter/">Word Counter</a>
+      <a href="/json-formatter/">JSON Formatter</a>
+      <a href="/zip/">ZIP / Unzip</a>
+    </div>
+    <div class="footer-links">
+      <h4>Company</h4>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2026 G9 Toolkit. All rights reserved.</div>
+</footer>
+
+<script>
+  const READ_WPM = 200;
+  const SPEAK_WPM = 130;
+
+  function fmtTime(totalSeconds) {
+    if (totalSeconds < 1) return '0 sec';
+    if (totalSeconds < 60) return Math.round(totalSeconds) + ' sec';
+    const m = Math.floor(totalSeconds / 60);
+    const s = Math.round(totalSeconds % 60);
+    return s === 0 ? m + ' min' : m + ' min ' + s + ' sec';
+  }
+
+  function countText() {
+    const text = document.getElementById('wc-input').value;
+
+    const trimmed = text.trim();
+    const words = trimmed ? trimmed.split(/\s+/).filter(Boolean) : [];
+    const wordCount = words.length;
+
+    const chars = text.length;
+    const charsNoSpaces = text.replace(/\s/g, '').length;
+
+    const sentences = trimmed ? (trimmed.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) || []).length : 0;
+    const paragraphs = trimmed ? trimmed.split(/\n\s*\n/).filter(p => p.trim().length > 0).length : 0;
+
+    const avgLen = wordCount ? (charsNoSpaces / wordCount) : 0;
+
+    document.getElementById('s-words').textContent = wordCount.toLocaleString();
+    document.getElementById('s-chars').textContent = chars.toLocaleString();
+    document.getElementById('s-chars-ns').textContent = charsNoSpaces.toLocaleString();
+    document.getElementById('s-sentences').textContent = sentences.toLocaleString();
+    document.getElementById('s-paragraphs').textContent = paragraphs.toLocaleString();
+    document.getElementById('s-reading').textContent = fmtTime(wordCount / READ_WPM * 60);
+    document.getElementById('s-speaking').textContent = fmtTime(wordCount / SPEAK_WPM * 60);
+    document.getElementById('s-avg').textContent = avgLen.toFixed(1);
+  }
+
+  async function copyText() {
+    const text = document.getElementById('wc-input').value;
+    if (!text) return;
+    const btn = document.getElementById('wc-copy');
+    try {
+      await navigator.clipboard.writeText(text);
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    } catch (e) {
+      btn.textContent = 'Copy failed';
+      setTimeout(() => { btn.textContent = 'Copy text'; }, 1500);
+    }
+  }
+
+  function clearText() {
+    document.getElementById('wc-input').value = '';
+    countText();
+    document.getElementById('wc-input').focus();
+  }
+
+  countText();
+</script>
+
+</body>
+</html>
