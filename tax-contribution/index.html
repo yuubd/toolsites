@@ -103,8 +103,8 @@
     </div>
 
     <div class="form-group">
-      <label for="revenue">Total government revenue — CAD billions <span style="font-weight:400;color:#94a3b8;">(≈ 2024 estimate, editable)</span></label>
-      <input type="text" inputmode="decimal" id="revenue" value="498" oninput="fmtInput(this);calc()" />
+      <label for="revenue">Total government revenue — CAD billions <span style="font-weight:400;color:#94a3b8;">(≈ 2025–26, editable)</span></label>
+      <input type="text" inputmode="decimal" id="revenue" value="507.5" oninput="fmtInput(this);calc()" />
     </div>
 
     <div class="tc-hero">
@@ -141,7 +141,7 @@
   <!-- Presets table -->
   <div class="card">
     <h2 style="font-size:1.05rem;font-weight:700;margin-bottom:0.35rem;">Real spending, your share</h2>
-    <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:1rem;">Approximate figures — your contribution updates with the tax amount above.</p>
+    <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:1rem;">Real figures with sources — tap an item to open its source. Amounts are approximate for the year shown; your share updates with your tax above.</p>
     <div class="table-wrap">
       <table>
         <thead>
@@ -159,7 +159,8 @@
     <h2>How your contribution is calculated</h2>
     <p>The idea is simple. A government funds its spending from its total revenue. If you contribute a certain amount of that revenue in tax, then your personal share of <em>any</em> spending is the same proportion:</p>
     <p style="background:#f8fafc;border-radius:8px;padding:1rem;font-weight:600;color:#1e293b;">your share = (your annual tax ÷ total government revenue) × the spending amount</p>
-    <p>For example, if you pay $12,000 in federal tax and total federal revenue is about $498&nbsp;billion, your share of every dollar is roughly 0.0000024%. Applied to a $19&nbsp;billion program, that's about $0.46 of your money — small, but real and yours.</p>
+    <p>For example, if you pay $12,000 in federal tax and total federal revenue is about $508&nbsp;billion, your share of every dollar is roughly 0.0000024%. Applied to a $19&nbsp;billion program, that's about $449 of your money — small, but real and yours.</p>
+    <p style="font-size:0.85rem;color:#64748b;">Note: the federal government spends more than it collects, so total spending (~$586&nbsp;billion) exceeds revenue. That's why your share of <em>total</em> spending can come out a bit higher than the tax you actually paid — the gap is funded by borrowing.</p>
 
     <h2>Why the numbers are so tiny</h2>
     <p>Canada's federal government collects hundreds of billions of dollars from millions of taxpayers. Any single person is a minuscule fraction of that total, so your share of a specific line item is often a fraction of a cent. That doesn't mean it's meaningless — it's exactly what "your tax dollars at work" adds up to, made concrete.</p>
@@ -207,7 +208,7 @@
 
 <script>
   // Approximate total revenue (CAD billions), recent year — all editable in the UI
-  const FED_REVENUE_B = 498;
+  const FED_REVENUE_B = 507.5;   // total federal revenue, Budget 2025 (2025–26)
   const PROVINCES = {
     'Ontario': 210, 'Quebec': 150, 'British Columbia': 81, 'Alberta': 74,
     'Manitoba': 24, 'Saskatchewan': 20, 'Nova Scotia': 16, 'New Brunswick': 12,
@@ -215,27 +216,28 @@
   };
 
   // Preset spending items (CAD). Federal set is specific; provincial set is generic.
+  // Real, sourced federal figures — each links to a primary/authoritative source
   const FED_PRESETS = [
-    { label: 'Total federal budget (all spending)', amount: 498e9 },
-    { label: 'Old Age Security (seniors)',           amount: 80e9 },
-    { label: 'Interest on the national debt',        amount: 54e9 },
-    { label: 'Canada Health Transfer to provinces',  amount: 52e9 },
-    { label: 'National defence (one year)',          amount: 33e9 },
-    { label: 'Trans Mountain pipeline expansion',    amount: 34e9 },
-    { label: 'F-35 fighter jet program',             amount: 19e9 },
-    { label: 'CBC / Radio-Canada (one year)',        amount: 1.4e9 },
-    { label: 'One new hospital',                     amount: 2e9 },
-    { label: 'ArriveCAN app',                        amount: 60e6 },
-    { label: 'One kilometre of urban highway',       amount: 10e6 },
-    { label: "One Member of Parliament's salary",    amount: 203100 }
+    { label: 'Total federal spending',              amount: 585.9e9, year: 'Budget 2025 (2025–26)', url: 'https://budget.canada.ca/2025/report-rapport/anx1-en.html' },
+    { label: 'Old Age Security & elderly benefits', amount: 85.5e9,  year: '2025–26', url: 'https://hillnotes.ca/2025/11/07/the-2025-federal-budget-at-a-glance/' },
+    { label: 'Canada Health Transfer to provinces', amount: 54.7e9,  year: '2025–26', url: 'https://hillnotes.ca/2025/11/07/the-2025-federal-budget-at-a-glance/' },
+    { label: 'Interest on the national debt',       amount: 49.1e9,  year: '2025–26 Main Estimates', url: 'https://www.pbo-dpb.ca/en/publications/RP-2526-003-S--government-expenditure-plan-main-estimates-2025-26--plan-depenses-gouvernement-budget-principal-depenses-2025-2026' },
+    { label: 'National defence',                    amount: 33.9e9,  year: '2025–26 Main Estimates', url: 'https://www.canada.ca/en/treasury-board-secretariat/services/planned-government-spending/government-expenditure-plan-main-estimates/2025-26-estimates.html' },
+    { label: 'Trans Mountain pipeline expansion',   amount: 34.2e9,  year: 'total build cost, 2024', url: 'https://www.pbo-dpb.ca/en/publications/RP-2425-021-S--trans-mountain-pipeline-2024-report--reseau-pipelines-trans-mountain-rapport-2024' },
+    { label: 'F-35 fighter jets — acquisition',     amount: 19e9,    year: '88 jets, contract', url: 'https://www.canada.ca/en/department-national-defence/services/procurement/fighter-jets/future-fighter-capability-project.html' },
+    { label: 'F-35 fighter jets — 45-year lifetime',amount: 73.9e9,  year: 'PBO estimate', url: 'https://cbc.ca/amp/1.7016178' },
+    { label: 'CBC / Radio-Canada',                  amount: 1.38e9,  year: '2024–25', url: 'https://www.cbc.ca/news/canada/federal-budget-cbc-funding-1.7175927' },
+    { label: 'ArriveCAN app',                       amount: 59.5e6,  year: 'Auditor General estimate', url: 'https://www.canada.ca/en/auditor-general/our-work/audit-reports/parl-oag-202402-01-e.html' },
+    { label: "One MP's salary (backbencher)",       amount: 203100,  year: '2024', url: 'https://lop.parl.ca/sites/ParlInfo/default/en_CA/People/Salaries' }
   ];
+  // Provincial examples are typical illustrative costs (vary by province/project)
   const PROV_PRESETS = [
-    { label: 'One new hospital',                 amount: 2e9 },
-    { label: 'One new public school',            amount: 30e6 },
-    { label: 'One kilometre of provincial highway', amount: 8e6 },
-    { label: 'One MRI machine for a hospital',   amount: 3e6 },
-    { label: "One teacher's annual salary",      amount: 85000 },
-    { label: "One nurse's annual salary",        amount: 90000 }
+    { label: 'One new hospital',                    amount: 2e9,   year: 'typical' },
+    { label: 'One new public school',               amount: 30e6,  year: 'typical' },
+    { label: 'One kilometre of provincial highway', amount: 8e6,   year: 'typical' },
+    { label: 'One MRI machine for a hospital',      amount: 3e6,   year: 'typical' },
+    { label: "One teacher's annual salary",         amount: 85000, year: 'typical' },
+    { label: "One nurse's annual salary",           amount: 90000, year: 'typical' }
   ];
 
   // Approximate 2024 income-tax brackets [upperLimit, rate] + basic personal amount (BPA).
@@ -337,7 +339,7 @@
   function currentPresets() {
     if (level === 'federal') return FED_PRESETS;
     const provRev = PROVINCES[document.getElementById('province').value] || 0;
-    return [{ label: 'Total provincial budget', amount: provRev * 1e9 }].concat(PROV_PRESETS);
+    return [{ label: 'Total provincial budget', amount: provRev * 1e9, year: '≈ 2024, editable' }].concat(PROV_PRESETS);
   }
 
   function fmtWhole(v) { return '$' + Math.round(v).toLocaleString('en-CA'); }
@@ -366,13 +368,17 @@
       'your contribution to ' + fmtCompact(amt) + ' of spending';
 
     // presets
-    const rows = currentPresets().map(p =>
-      '<tr>' +
-        '<td>' + p.label + '</td>' +
+    const rows = currentPresets().map(p => {
+      const name = p.url
+        ? '<a href="' + p.url + '" target="_blank" rel="noopener" style="color:#2563eb;font-weight:600;">' + p.label + '</a>'
+        : '<span style="font-weight:600;color:#1e293b;">' + p.label + '</span>';
+      const note = p.year ? '<div style="font-size:0.72rem;color:#94a3b8;margin-top:0.1rem;">' + p.year + '</div>' : '';
+      return '<tr>' +
+        '<td>' + name + note + '</td>' +
         '<td style="white-space:nowrap;">' + fmtCompact(p.amount) + '</td>' +
         '<td style="text-align:right;"><span class="tc-your">' + fmtContribution(f * p.amount) + '</span></td>' +
-      '</tr>'
-    ).join('');
+      '</tr>';
+    }).join('');
     document.getElementById('preset-body').innerHTML = rows;
   }
 
@@ -380,6 +386,7 @@
   (function () {
     const sel = document.getElementById('province');
     sel.innerHTML = Object.keys(PROVINCES).map(p => '<option value="' + p + '">' + p + '</option>').join('');
+    syncRevenue();
     calc();
   })();
 </script>
