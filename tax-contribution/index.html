@@ -209,10 +209,39 @@
 <script>
   // Approximate total revenue (CAD billions), recent year — all editable in the UI
   const FED_REVENUE_B = 507.5;   // total federal revenue, Budget 2025 (2025–26)
+
+  // Real total provincial budget (2024–25 expenses, CAD billions) + source link
   const PROVINCES = {
-    'Ontario': 210, 'Quebec': 150, 'British Columbia': 81, 'Alberta': 74,
-    'Manitoba': 24, 'Saskatchewan': 20, 'Nova Scotia': 16, 'New Brunswick': 12,
-    'Newfoundland and Labrador': 10, 'Prince Edward Island': 3
+    'Ontario':                   { revB: 214.5, url: 'https://budget.ontario.ca/2024/highlights.html' },
+    'Quebec':                    { revB: 157.8, url: 'https://www.cbc.ca/news/canada/montreal/quebec-budget-2024-2025-1.7139641' },
+    'British Columbia':          { revB: 89,    url: 'https://www.bcbudget.gov.bc.ca/2024/' },
+    'Alberta':                   { revB: 73.2,  url: 'https://www.alberta.ca/budget-highlights' },
+    'Manitoba':                  { revB: 24.1,  url: 'https://www.gov.mb.ca/finance/budgets/provincialbudgets.html' },
+    'Saskatchewan':              { revB: 20.1,  url: 'https://www.cbc.ca/news/canada/saskatchewan/sask-budget-2024-1.7149209' },
+    'Nova Scotia':               { revB: 16.5,  url: 'https://news.novascotia.ca/en/2024/02/29/budget-2024-25-building-nova-scotia-faster' },
+    'New Brunswick':             { revB: 13.3,  url: 'https://www.rbc.com/en/economics/canadian-analysis/provincial-and-fiscal-outlooks/provincial-budgets-and-economic-statements/new-brunswick-budget-2024-planning-a-surplus-for-the-seventh-year-in-a-row/' },
+    'Newfoundland and Labrador': { revB: 10.4,  url: 'https://crestviewstrategy.com/newfoundland-and-labrador-tables-2024-budget/' },
+    'Prince Edward Island':      { revB: 3.23,  url: 'https://www.crestviewstrategy.com/insights/nova-scotia-and-prince-edward-island-table-2024-budgets/' }
+  };
+
+  // Real, sourced spending items for specific provinces (2024–25)
+  const PROV_ITEMS = {
+    'Ontario': [
+      { label: 'Health spending', amount: 85e9, year: '2024–25', url: 'https://budget.ontario.ca/2024/highlights.html' }
+    ],
+    'Quebec': [
+      { label: 'Health & social services', amount: 61.9e9, year: '2024–25', url: 'https://www.cbc.ca/news/canada/montreal/quebec-budget-2024-2025-1.7139641' },
+      { label: 'Québec City tramway', amount: 7e9, year: '2024 estimate', url: 'https://en.wikipedia.org/wiki/Quebec_City_Tramway' }
+    ],
+    'British Columbia': [
+      { label: 'Site C hydro dam', amount: 16e9, year: 'total build cost', url: 'https://www.cbc.ca/news/canada/british-columbia/site-c-announcement-friday-1.5928719' }
+    ],
+    'Alberta': [
+      { label: 'Health spending', amount: 26.2e9, year: '2024–25', url: 'https://www.alberta.ca/budget-highlights' }
+    ],
+    'Saskatchewan': [
+      { label: 'Health spending', amount: 7.6e9, year: '2024–25', url: 'https://www.saskatchewan.ca/government/news-and-media/2024/march/20/budget-202425-classrooms-care-and-communities' }
+    ]
   };
 
   // Preset spending items (CAD). Federal set is specific; provincial set is generic.
@@ -332,14 +361,16 @@
   // Reset the revenue field to the stored default for the current selection
   function syncRevenue() {
     let b = FED_REVENUE_B;
-    if (level === 'provincial') b = PROVINCES[document.getElementById('province').value] || 0;
+    if (level === 'provincial') b = (PROVINCES[document.getElementById('province').value] || {}).revB || 0;
     document.getElementById('revenue').value = b.toLocaleString('en-CA');
   }
 
   function currentPresets() {
     if (level === 'federal') return FED_PRESETS;
-    const provRev = PROVINCES[document.getElementById('province').value] || 0;
-    return [{ label: 'Total provincial budget', amount: provRev * 1e9, year: '≈ 2024, editable' }].concat(PROV_PRESETS);
+    const prov = document.getElementById('province').value;
+    const p = PROVINCES[prov] || { revB: 0 };
+    const total = { label: 'Total provincial budget', amount: p.revB * 1e9, year: '2024–25 budget', url: p.url };
+    return [total].concat(PROV_ITEMS[prov] || []).concat(PROV_PRESETS);
   }
 
   function fmtWhole(v) { return '$' + Math.round(v).toLocaleString('en-CA'); }
