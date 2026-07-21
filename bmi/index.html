@@ -12,6 +12,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%232563eb%22%2F%3E%3Ctext%20x%3D%2216%22%20y%3D%2216%22%20font-family%3D%22-apple-system%2CBlinkMacSystemFont%2CSegoe%20UI%2CRoboto%2Csans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22800%22%20letter-spacing%3D%22-1%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3EG9%3C%2Ftext%3E%3C%2Fsvg%3E" />
   <link rel="stylesheet" href="/css/style.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4373850276177697" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -67,6 +68,8 @@
     .bmi-table th { background: #f1f5f9; padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; color: #475569; }
     .bmi-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f1f5f9; }
     .bmi-table tr.highlight td { background: #eff6ff; font-weight: 600; }
+    .chart-h { font-size: 0.85rem; font-weight: 700; color: #475569; margin: 1.25rem 0 0.5rem; }
+    .chart-h:first-of-type { margin-top: 0.25rem; }
   </style>
 </head>
 <body>
@@ -75,6 +78,7 @@
   <div class="header-inner">
     <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
     <nav>
+      <a href="/guides/">Guides</a>
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
     </nav>
@@ -82,7 +86,6 @@
 </header>
 
 <div class="container">
-  <div class="layout">
     <main>
       <div class="card">
         <h1 class="tool-title">BMI Calculator</h1>
@@ -162,6 +165,16 @@
         </table>
       </div>
 
+      <div class="card" id="charts-card" style="display:none;">
+        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Visualize your BMI</h2>
+        <div class="chart-h">Your weight vs the healthy range</div>
+        <div style="position:relative;height:140px;"><canvas id="chartWeight"></canvas></div>
+        <div class="chart-h">Relative health risk across BMI</div>
+        <div style="position:relative;height:220px;"><canvas id="chartRisk"></canvas></div>
+        <div class="chart-h">Where your BMI falls on the scale</div>
+        <div style="position:relative;height:110px;"><canvas id="chartCat"></canvas></div>
+      </div>
+
       <div class="card prose">
         <h2>What is BMI?</h2>
         <p>Body Mass Index (BMI) is a numerical value derived from your weight and height. It is a widely used screening tool to categorize individuals as underweight, normal weight, overweight, or obese. BMI was developed by Belgian mathematician Adolphe Quetelet in the 1830s and adopted by health organizations worldwide as a quick, inexpensive screening method.</p>
@@ -206,11 +219,6 @@
         <p>Remember: BMI is a single data point. A healthy lifestyle — regular movement, nutritious food, good sleep, and low stress — is the goal, and a healthy BMI is often the natural result.</p>
       </div>
     </main>
-
-    <aside>
-      <div class="ad-slot ad-slot-sidebar"></div>
-    </aside>
-  </div>
 </div>
 
 <footer>
@@ -221,7 +229,7 @@
     </div>
     <div class="footer-links">
       <h4>Tools</h4>
-      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/">Mortgage Calculator</a>
       <a href="/bmi/">BMI Calculator</a>
       <a href="/world-clock/">World Clock</a>
       <a href="/json-formatter/">JSON Formatter</a>
@@ -230,6 +238,7 @@
     <div class="footer-links">
       <h4>Company</h4>
       <a href="/about/">About</a>
+      <a href="/guides/">Guides</a>
       <a href="/contact/">Contact</a>
     </div>
     <div class="footer-links">
@@ -243,6 +252,58 @@
 
 <script>
   let unit = 'metric';
+  let chartW, chartR, chartC;
+  const CAT_COLOR = { underweight: '#3b82f6', normal: '#22c55e', overweight: '#eab308', obese: '#ef4444' };
+  const round1 = v => Math.round(v * 10) / 10;
+  // Illustrative relative-risk index: lowest near BMI 22, rising on both sides (steeper for high BMI)
+  const bmiRisk = b => b >= 22 ? 1 + 0.03 * (b - 22) * (b - 22) : 1 + 0.02 * (22 - b) * (22 - b);
+
+  function renderBmiCharts(d) {
+    const color = CAT_COLOR[d.catClass] || '#2563eb';
+
+    // 1) Your weight vs the healthy range
+    if (chartW) chartW.destroy();
+    chartW = new Chart(document.getElementById('chartWeight'), {
+      type: 'bar',
+      data: { labels: ['Healthy min', 'You', 'Healthy max'], datasets: [{
+        data: [round1(d.dispLow), round1(d.dispW), round1(d.dispHigh)],
+        backgroundColor: ['#86efac', color, '#86efac'], borderRadius: 6 }] },
+      options: { indexAxis: 'y', maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw + ' ' + d.uLbl } } },
+        scales: { x: { beginAtZero: true, ticks: { callback: v => v + ' ' + d.uLbl, font: { size: 11 } } }, y: { ticks: { font: { size: 11 } } } } }
+    });
+
+    // 2) Relative health risk across BMI, with your BMI marked
+    if (chartR) chartR.destroy();
+    const curve = [];
+    for (let b = 15; b <= 40; b += 0.5) curve.push({ x: b, y: round1(bmiRisk(b)) });
+    chartR = new Chart(document.getElementById('chartRisk'), {
+      type: 'line',
+      data: { datasets: [
+        { label: 'Relative risk', data: curve, borderColor: '#94a3b8', backgroundColor: '#f1f5f9', fill: true, pointRadius: 0, tension: 0.3, borderWidth: 2 },
+        { label: 'You', data: [{ x: d.bmi, y: round1(bmiRisk(d.bmi)) }], borderColor: color, backgroundColor: color, pointRadius: 6, pointHoverRadius: 7, showLine: false } ] },
+      options: { maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { title: i => 'BMI ' + i[0].parsed.x, label: c => 'risk index ' + c.parsed.y } } },
+        scales: { x: { type: 'linear', min: 15, max: 40, title: { display: true, text: 'BMI' }, ticks: { stepSize: 5, font: { size: 11 } } },
+          y: { beginAtZero: true, title: { display: true, text: 'Relative risk' }, ticks: { font: { size: 11 } } } } }
+    });
+
+    // 3) Where your BMI falls on the coloured scale
+    if (chartC) chartC.destroy();
+    const segs = [
+      { label: 'Underweight', w: 18.5, key: 'underweight', c: '#3b82f6' },
+      { label: 'Normal', w: 6.5, key: 'normal', c: '#22c55e' },
+      { label: 'Overweight', w: 5, key: 'overweight', c: '#eab308' },
+      { label: 'Obese', w: 10, key: 'obese', c: '#ef4444' }
+    ];
+    chartC = new Chart(document.getElementById('chartCat'), {
+      type: 'bar',
+      data: { labels: ['BMI'], datasets: segs.map(s => ({ label: s.label, data: [s.w], backgroundColor: s.key === d.catClass ? s.c : s.c + '55' })) },
+      options: { indexAxis: 'y', maintainAspectRatio: false,
+        plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }, tooltip: { enabled: false }, title: { display: true, text: 'Your BMI: ' + d.bmi.toFixed(1) } },
+        scales: { x: { stacked: true, max: 40, ticks: { stepSize: 5, font: { size: 11 } } }, y: { stacked: true, ticks: { display: false } } } }
+    });
+  }
 
   function setUnit(u) {
     unit = u;
@@ -311,6 +372,14 @@
     else if (bmi < 35)   document.getElementById('row-obese').classList.add('highlight');
     else if (bmi < 40)   document.getElementById('row-obese2').classList.add('highlight');
     else                 document.getElementById('row-obese3').classList.add('highlight');
+
+    // charts
+    const dispW    = unit === 'metric' ? w : w / 0.453592;
+    const dispLow  = unit === 'metric' ? idealLow : idealLow / 0.453592;
+    const dispHigh = unit === 'metric' ? idealHigh : idealHigh / 0.453592;
+    const uLbl = unit === 'metric' ? 'kg' : 'lbs';
+    document.getElementById('charts-card').style.display = 'block';
+    renderBmiCharts({ bmi, catClass, dispW, dispLow, dispHigh, uLbl });
   }
 </script>
 
