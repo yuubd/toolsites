@@ -56,6 +56,7 @@
   <div class="header-inner">
     <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
     <nav>
+      <a href="/guides/">Guides</a>
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
     </nav>
@@ -70,7 +71,6 @@
 </div>
 
 <div class="container">
-  <div class="ad-slot ad-slot-banner"></div>
 
   <div class="card">
     <textarea class="wc-textarea" id="wc-input" placeholder="Type or paste your text here…" oninput="countText()" autofocus></textarea>
@@ -91,26 +91,76 @@
     </div>
   </div>
 
-  <div class="ad-slot ad-slot-bottom"></div>
 
   <!-- Educational content -->
   <div class="card prose" style="margin-top:1.5rem;">
-    <h2>How the word counter works</h2>
-    <p>Everything runs entirely in your browser — your text is never uploaded to a server. As you type or paste, the counter recalculates instantly. <strong>Words</strong> are counted by splitting your text on spaces and line breaks; <strong>characters</strong> are counted both with and without spaces so you can meet strict limits like a Twitter/X post or an SMS message. <strong>Sentences</strong> are detected by terminal punctuation (. ! ?) and <strong>paragraphs</strong> by blank lines between blocks of text.</p>
+    <h2>How each count is measured</h2>
+    <p>Everything runs in your browser — your text is never uploaded, and the counts update as you type. Here is exactly how each number is calculated, so you can trust it:</p>
+    <ul>
+      <li><strong>Words</strong> — the text is split on spaces and line breaks, and empty fragments are ignored. A hyphenated term like "self-esteem" counts as one word, and so does "twenty-one". Numbers and standalone symbols separated by spaces each count as a word.</li>
+      <li><strong>Characters</strong> — every character is counted, including spaces, punctuation, and emoji. A separate "characters without spaces" total is shown for fields that ignore whitespace.</li>
+      <li><strong>Sentences</strong> — detected by sentence-ending punctuation (. ! ?). Abbreviations such as "Dr." or "e.g." can occasionally add one to the count, because the tool cannot always tell an abbreviation from a full stop.</li>
+      <li><strong>Paragraphs</strong> — blocks of text separated by one or more blank lines. A single line break inside a block does not start a new paragraph.</li>
+      <li><strong>Average word length</strong> — characters (no spaces) divided by words. A rising average often signals denser, harder-to-read phrasing.</li>
+    </ul>
+
+    <h2>Word and character limits by platform</h2>
+    <p>One of the most common reasons to count is to fit a specific limit. These are the caps writers run into most often:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Platform / field</th><th>Limit</th></tr></thead>
+        <tbody>
+          <tr><td>X (Twitter) post</td><td>280 characters</td></tr>
+          <tr><td>SMS text message</td><td>160 characters per segment</td></tr>
+          <tr><td>Google search title</td><td>~60 characters</td></tr>
+          <tr><td>Google meta description</td><td>~155–160 characters</td></tr>
+          <tr><td>Instagram caption</td><td>2,200 characters</td></tr>
+          <tr><td>Facebook post (best engagement)</td><td>~40–80 characters</td></tr>
+          <tr><td>LinkedIn post</td><td>3,000 characters</td></tr>
+          <tr><td>YouTube description</td><td>5,000 characters</td></tr>
+          <tr><td>US Common App essay</td><td>650 words</td></tr>
+          <tr><td>UCAS personal statement (UK)</td><td>4,000 characters / 47 lines</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <h2>Reading and speaking time</h2>
-    <p>Reading time assumes an average silent reading speed of about 200 words per minute, which is typical for adult readers of general-audience text. Speaking time assumes about 130 words per minute, a comfortable pace for presentations and voiceovers. Both are estimates — dense or technical material reads more slowly, and skimming reads faster.</p>
+    <p>Reading time assumes about 200 words per minute (wpm), a typical silent reading speed for adults on general-audience text — dense or technical writing reads slower, and skimming reads faster. Speaking time assumes about 130 wpm, a comfortable pace for presentations, voiceovers, and speeches. That makes word count a quick way to size a talk:</p>
+    <ul>
+      <li>1-minute speech ≈ 130 words</li>
+      <li>3-minute speech ≈ 390 words</li>
+      <li>5-minute speech ≈ 650 words</li>
+      <li>10-minute speech ≈ 1,300 words</li>
+      <li>20-minute talk ≈ 2,600 words</li>
+    </ul>
 
-    <h2>Why word count matters</h2>
-    <p>Many kinds of writing come with hard or soft length limits. Academic essays and assignments often specify a word range. Meta descriptions for SEO should stay near 150–160 characters. Social posts have strict character caps. Blog posts frequently target 1,000–2,000 words for search visibility. Knowing your counts as you write helps you hit the target without padding or cutting at the last minute.</p>
+    <h2>Words to pages</h2>
+    <p>"How many pages is my essay?" depends on font, size, and spacing, but for a standard 12-point Times New Roman document these approximations are reliable:</p>
+    <ul>
+      <li>500 words ≈ 1 page single-spaced (2 pages double-spaced)</li>
+      <li>1,000 words ≈ 2 pages single-spaced (4 double-spaced)</li>
+      <li>2,500 words ≈ 5 pages single-spaced (10 double-spaced)</li>
+      <li>5,000 words ≈ 10 pages single-spaced (20 double-spaced)</li>
+    </ul>
+
+    <h2>Word count for SEO</h2>
+    <p>If you write for search, a few counts matter more than the rest. Keep your page <strong>title tag</strong> to roughly 50–60 characters so it is not truncated in results, and your <strong>meta description</strong> near 150–160 characters. There is no magic word count for ranking, but in-depth articles that fully answer a query tend to perform well, and many competitive topics are covered in 1,000–2,000+ words. Length should follow the topic — padding to hit a number rarely helps.</p>
 
     <h2>Tips for tighter writing</h2>
     <ul>
-      <li>Cut filler phrases like "in order to" (use "to") and "due to the fact that" (use "because").</li>
+      <li>Cut filler: "in order to" → "to"; "due to the fact that" → "because"; "at this point in time" → "now".</li>
       <li>Prefer active voice — it usually needs fewer words and reads more directly.</li>
+      <li>Delete throat-clearing openers like "It is important to note that".</li>
       <li>Watch the average word length: consistently long words can signal overly complex phrasing.</li>
-      <li>Break long paragraphs up — shorter paragraphs improve readability on screens.</li>
+      <li>Break long paragraphs up — shorter paragraphs read better on screens.</li>
     </ul>
+
+    <h2>Frequently asked questions</h2>
+    <p><strong>Does this word counter save or upload my text?</strong> No. All counting happens locally in your browser; nothing is sent to a server or stored.</p>
+    <p><strong>How many words is a 5-minute speech?</strong> About 650 words at a normal speaking pace of ~130 wpm. Slow down for emphasis and it may be closer to 550–600.</p>
+    <p><strong>How long does it take to read 1,000 words?</strong> Roughly 4–5 minutes of silent reading at 200 wpm.</p>
+    <p><strong>How many pages is 1,000 words?</strong> About 2 pages single-spaced, or 4 pages double-spaced, in 12-point Times New Roman.</p>
+    <p><strong>Do spaces count as characters?</strong> Usually yes — most platforms count spaces. This tool shows both totals so you can meet either rule.</p>
   </div>
 </div>
 
@@ -133,6 +183,7 @@
     <div class="footer-links">
       <h4>Company</h4>
       <a href="/about/">About</a>
+      <a href="/guides/">Guides</a>
       <a href="/contact/">Contact</a>
     </div>
     <div class="footer-links">
@@ -203,6 +254,20 @@
   }
 
   countText();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Does this word counter save or upload my text?", "acceptedAnswer": { "@type": "Answer", "text": "No. All counting happens locally in your browser; nothing is sent to a server or stored." } },
+    { "@type": "Question", "name": "How many words is a 5-minute speech?", "acceptedAnswer": { "@type": "Answer", "text": "About 650 words at a normal speaking pace of roughly 130 words per minute." } },
+    { "@type": "Question", "name": "How long does it take to read 1,000 words?", "acceptedAnswer": { "@type": "Answer", "text": "Roughly 4 to 5 minutes of silent reading at about 200 words per minute." } },
+    { "@type": "Question", "name": "How many pages is 1,000 words?", "acceptedAnswer": { "@type": "Answer", "text": "About 2 pages single-spaced, or 4 pages double-spaced, in 12-point Times New Roman." } },
+    { "@type": "Question", "name": "Do spaces count as characters?", "acceptedAnswer": { "@type": "Answer", "text": "Usually yes. Most platforms count spaces. This tool shows both totals so you can meet either rule." } }
+  ]
+}
 </script>
 
 </body>

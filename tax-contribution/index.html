@@ -57,6 +57,7 @@
   <div class="header-inner">
     <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
     <nav>
+      <a href="/guides/">Guides</a>
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
     </nav>
@@ -71,7 +72,6 @@
 </div>
 
 <div class="container">
-  <div class="ad-slot ad-slot-banner"></div>
 
   <!-- Inputs -->
   <div class="card">
@@ -152,7 +152,6 @@
     </div>
   </div>
 
-  <div class="ad-slot ad-slot-bottom"></div>
 
   <!-- Educational content -->
   <div class="card prose" style="margin-top:1.5rem;">
@@ -172,6 +171,22 @@
       <li>Revenue figures are round approximations for a recent year and are editable — enter a more precise number if you have one.</li>
       <li>"Your annual tax" is whatever you choose to include. For the fairest result, include your income tax plus a rough estimate of the sales, fuel, and other taxes you pay to that level of government.</li>
     </ul>
+
+    <h2>How we estimate your income tax</h2>
+    <p>When you choose "estimate from my salary," the calculator applies Canada's marginal tax brackets to your income. Canada uses a progressive system: each slice of income is taxed at its own rate, not your whole income at the top rate. The 2024 federal brackets run from 15% on the first ~$55,900 up to 33% on income above ~$247,000, and each province adds its own brackets on top. We also subtract the basic personal amount — the slice of income everyone can earn tax-free — as a credit. The result is a close estimate of the income tax you owe to that level of government; it deliberately excludes surtaxes, health premiums, and credits beyond the basic personal amount, so treat it as a ballpark, not a tax return.</p>
+
+    <h2>Where your federal tax dollars actually go</h2>
+    <p>It helps to know what the biggest line items are. In round terms, the largest slices of Canada's ~$586&nbsp;billion federal budget are elderly benefits (Old Age Security and the Guaranteed Income Supplement, ~$85&nbsp;billion), the Canada Health Transfer to provinces (~$55&nbsp;billion), interest on the national debt (~$49&nbsp;billion), and national defence (~$34&nbsp;billion). Together, seniors' benefits, transfers to provinces and people, and debt interest make up the majority of federal spending — the individual "programs" people argue about are a smaller share than most assume. The table above lets you see your personal slice of each.</p>
+
+    <h2>Federal vs provincial: who pays for what</h2>
+    <p>Your federal and provincial taxes fund different things, which is why the tool separates them. Broadly, the <strong>federal</strong> government handles national defence, employment insurance, Old Age Security, the RCMP, immigration, and large cash transfers to the provinces. The <strong>provinces</strong> run the services you use day to day — hospitals and doctors, public schools and universities, highways, and social assistance — funded by a mix of their own taxes and those federal transfers. So when you want your share of a hospital, use the provincial view; for a fighter jet or Old Age Security, use the federal view.</p>
+
+    <h2>Frequently asked questions</h2>
+    <p><strong>Is this my actual tax bill?</strong> No. It is an educational estimate of your <em>share of spending</em>, calculated from the tax you pay and the government's total revenue. It is not tax advice or an official figure.</p>
+    <p><strong>Why is my share of total spending more than the tax I paid?</strong> The federal government spends more than it collects and covers the gap by borrowing, so total spending exceeds revenue. Your proportional share of that larger number can edge above what you actually paid.</p>
+    <p><strong>Should I include GST/HST and other taxes?</strong> For the most complete picture, yes — add a rough estimate of the sales, fuel, and other taxes you pay to that government on top of your income tax. A single income-tax figure still gives a reasonable lower-bound estimate.</p>
+    <p><strong>Where do the spending numbers come from?</strong> Each figure links to its source — federal Budget 2025, the Parliamentary Budget Officer, departmental estimates, the Auditor General, and provincial budgets. Amounts are approximate for the year shown.</p>
+    <p><strong>Does the tool store my salary or tax?</strong> No. Everything is calculated in your browser, and nothing is uploaded or saved.</p>
   </div>
 </div>
 
@@ -195,6 +210,7 @@
     <div class="footer-links">
       <h4>Company</h4>
       <a href="/about/">About</a>
+      <a href="/guides/">Guides</a>
       <a href="/contact/">Contact</a>
     </div>
     <div class="footer-links">
@@ -420,6 +436,20 @@
     syncRevenue();
     calc();
   })();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Is this my actual tax bill?", "acceptedAnswer": { "@type": "Answer", "text": "No. It is an educational estimate of your share of government spending, calculated from the tax you pay and the government's total revenue. It is not tax advice or an official figure." } },
+    { "@type": "Question", "name": "Why is my share of total spending more than the tax I paid?", "acceptedAnswer": { "@type": "Answer", "text": "The federal government spends more than it collects and covers the gap by borrowing, so total spending exceeds revenue. Your proportional share of that larger number can edge above what you actually paid." } },
+    { "@type": "Question", "name": "Should I include GST/HST and other taxes?", "acceptedAnswer": { "@type": "Answer", "text": "For the most complete picture, add a rough estimate of the sales, fuel, and other taxes you pay to that government on top of your income tax. A single income-tax figure still gives a reasonable lower-bound estimate." } },
+    { "@type": "Question", "name": "Where do the spending numbers come from?", "acceptedAnswer": { "@type": "Answer", "text": "Each figure links to its source, including federal Budget 2025, the Parliamentary Budget Officer, departmental estimates, the Auditor General, and provincial budgets. Amounts are approximate for the year shown." } },
+    { "@type": "Question", "name": "Does the tool store my salary or tax?", "acceptedAnswer": { "@type": "Answer", "text": "No. Everything is calculated in your browser, and nothing is uploaded or saved." } }
+  ]
+}
 </script>
 
 </body>

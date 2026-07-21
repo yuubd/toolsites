@@ -59,6 +59,7 @@
   <div class="header-inner">
     <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
     <nav>
+      <a href="/guides/">Guides</a>
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
     </nav>
@@ -70,7 +71,6 @@
     <h1 class="tool-title">JSON Formatter</h1>
     <p class="tool-subtitle">Format, validate, minify JSON — and convert between JSON and CSV</p>
 
-    <div class="ad-slot ad-slot-banner"></div>
 
     <div class="card">
       <div class="tab-bar">
@@ -182,9 +182,15 @@
       <h2>JSON in Modern Development</h2>
       <p>JSON is the backbone of modern web APIs. RESTful APIs return JSON. GraphQL responses are JSON. Configuration files like <code>package.json</code>, <code>tsconfig.json</code>, and <code>eslintrc.json</code> are all JSON. Even NoSQL databases like MongoDB store data in a JSON-like format called BSON (Binary JSON).</p>
       <p>JSON Schema is a vocabulary for validating the structure of JSON documents. It lets you define exactly what fields are required, what types they must be, and what constraints they must satisfy — similar to a database schema, but for JSON. Many API testing tools and CI pipelines use JSON Schema to automatically validate that API responses conform to their documented structure.</p>
+
+      <h2>Frequently asked questions</h2>
+      <p><strong>Is my JSON uploaded anywhere?</strong> No. Formatting, validation, and conversion all run in your browser using JavaScript. Your data never leaves your device, which makes it safe to paste sensitive API responses or config files.</p>
+      <p><strong>Why does my JSON say "unexpected token"?</strong> The most common causes are a trailing comma after the last item, single quotes instead of double quotes, unquoted keys, or a missing closing bracket or brace. Paste your JSON above and the error location will point you to the problem.</p>
+      <p><strong>Can I convert JSON to CSV or CSV to JSON?</strong> Yes. Use the conversion tabs. JSON-to-CSV works best on a flat array of objects with consistent keys; deeply nested structures are flattened or may need manual adjustment.</p>
+      <p><strong>What indentation should I use?</strong> Two spaces is the most common convention for web JSON; four spaces is also widely used. For production API responses, minify instead to reduce payload size.</p>
+      <p><strong>Are comments allowed in JSON?</strong> Standard JSON does not allow comments. Formats like JSON5 and JSONC (used by VS Code config files) do, but a strict JSON parser will reject them.</p>
     </div>
 
-    <div class="ad-slot ad-slot-bottom"></div>
   </div>
 </div>
 
@@ -196,7 +202,7 @@
     </div>
     <div class="footer-links">
       <h4>Tools</h4>
-      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/">Mortgage Calculator</a>
       <a href="/bmi/">BMI Calculator</a>
       <a href="/world-clock/">World Clock</a>
       <a href="/json-formatter/">JSON Formatter</a>
@@ -205,6 +211,7 @@
     <div class="footer-links">
       <h4>Company</h4>
       <a href="/about/">About</a>
+      <a href="/guides/">Guides</a>
       <a href="/contact/">Contact</a>
     </div>
     <div class="footer-links">
@@ -369,6 +376,20 @@
     const stats = document.getElementById(inputId.replace('input','stats'));
     if (stats) stats.innerHTML = '';
   }
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Is my JSON uploaded anywhere?", "acceptedAnswer": { "@type": "Answer", "text": "No. Formatting, validation, and conversion all run in your browser using JavaScript. Your data never leaves your device, so it is safe to paste sensitive API responses or config files." } },
+    { "@type": "Question", "name": "Why does my JSON say unexpected token?", "acceptedAnswer": { "@type": "Answer", "text": "The most common causes are a trailing comma after the last item, single quotes instead of double quotes, unquoted keys, or a missing closing bracket or brace." } },
+    { "@type": "Question", "name": "Can I convert JSON to CSV or CSV to JSON?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Use the conversion tabs. JSON-to-CSV works best on a flat array of objects with consistent keys; deeply nested structures are flattened or may need manual adjustment." } },
+    { "@type": "Question", "name": "What indentation should I use for JSON?", "acceptedAnswer": { "@type": "Answer", "text": "Two spaces is the most common convention for web JSON; four spaces is also widely used. For production API responses, minify instead to reduce payload size." } },
+    { "@type": "Question", "name": "Are comments allowed in JSON?", "acceptedAnswer": { "@type": "Answer", "text": "Standard JSON does not allow comments. Formats like JSON5 and JSONC do, but a strict JSON parser will reject them." } }
+  ]
+}
 </script>
 
 </body>

@@ -87,6 +87,7 @@
   <div class="header-inner">
     <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
     <nav>
+      <a href="/guides/">Guides</a>
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
     </nav>
@@ -99,7 +100,6 @@
 
   <div class="your-time" id="your-time"></div>
 
-  <div class="ad-slot ad-slot-banner"></div>
 
   <div class="converter-card">
     <div class="section-label">Time zone converter</div>
@@ -147,9 +147,15 @@
     <h2>Time Zones in Software Development</h2>
     <p>Handling time zones correctly is one of the most notorious sources of bugs in software. The golden rule: store all timestamps in UTC, and convert to local time only for display. Never store local time in a database without the UTC offset. Use IANA time zone identifiers (like "America/Toronto" or "Asia/Tokyo") rather than abbreviations like EST or JST, which are ambiguous — EST refers to both Eastern Standard Time (UTC−5) and Australian Eastern Standard Time (UTC+10).</p>
     <p>The JavaScript <code>Intl.DateTimeFormat</code> API — used to power this world clock — handles IANA time zones natively in all modern browsers, making it the safest and most accurate way to display times across zones without a server round-trip.</p>
+
+    <h2>Frequently asked questions</h2>
+    <p><strong>How many time zones are there?</strong> There are 24 standard one-hour zones, but in practice around 38 offsets are in use because some regions use 30- or 45-minute offsets (India is UTC+5:30, Nepal UTC+5:45), and Daylight Saving Time shifts many zones for part of the year.</p>
+    <p><strong>What's the difference between UTC and GMT?</strong> For everyday purposes they are the same clock time. GMT is a time zone; UTC is a precise time standard based on atomic clocks. Aviation, computing, and science use UTC.</p>
+    <p><strong>What's the best time to schedule a call between North America and Asia?</strong> The overlap is narrow. Early morning on the US West Coast (7–9&nbsp;a.m. Pacific) lands in the early evening across East Asia, which is usually the most workable window.</p>
+    <p><strong>Does this clock keep accurate time if my computer clock is wrong?</strong> It reads your device's clock, so it is only as accurate as your system time. Enable automatic network time on your device for the best results.</p>
+    <p><strong>Is my location or data sent anywhere?</strong> No. All times are computed locally in your browser using your device clock and the built-in time-zone database.</p>
   </div>
 
-  <div class="ad-slot ad-slot-bottom"></div>
 </div>
 
 <footer>
@@ -160,7 +166,7 @@
     </div>
     <div class="footer-links">
       <h4>Tools</h4>
-      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/">Mortgage Calculator</a>
       <a href="/bmi/">BMI Calculator</a>
       <a href="/world-clock/">World Clock</a>
       <a href="/json-formatter/">JSON Formatter</a>
@@ -169,6 +175,7 @@
     <div class="footer-links">
       <h4>Company</h4>
       <a href="/about/">About</a>
+      <a href="/guides/">Guides</a>
       <a href="/contact/">Contact</a>
     </div>
     <div class="footer-links">
@@ -330,6 +337,20 @@
   renderClocks();
   updateYourTime();
   setInterval(() => { renderClocks(); updateYourTime(); }, 1000);
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "How many time zones are there?", "acceptedAnswer": { "@type": "Answer", "text": "There are 24 standard one-hour zones, but around 38 offsets are in use because some regions use 30- or 45-minute offsets and Daylight Saving Time shifts many zones for part of the year." } },
+    { "@type": "Question", "name": "What is the difference between UTC and GMT?", "acceptedAnswer": { "@type": "Answer", "text": "For everyday purposes they are the same clock time. GMT is a time zone; UTC is a precise time standard based on atomic clocks used by aviation, computing, and science." } },
+    { "@type": "Question", "name": "What is the best time to schedule a call between North America and Asia?", "acceptedAnswer": { "@type": "Answer", "text": "Early morning on the US West Coast, around 7 to 9 a.m. Pacific, lands in the early evening across East Asia, which is usually the most workable window." } },
+    { "@type": "Question", "name": "Does this clock keep accurate time if my computer clock is wrong?", "acceptedAnswer": { "@type": "Answer", "text": "It reads your device clock, so it is only as accurate as your system time. Enable automatic network time on your device for the best results." } },
+    { "@type": "Question", "name": "Is my location or data sent anywhere?", "acceptedAnswer": { "@type": "Answer", "text": "No. All times are computed locally in your browser using your device clock and the built-in time-zone database." } }
+  ]
+}
 </script>
 
 </body>

@@ -83,6 +83,7 @@
   <div class="header-inner">
     <a href="/" class="logo"><span class="logo-mark">G9</span>Toolkit</a>
     <nav>
+      <a href="/guides/">Guides</a>
       <a href="/about/">About</a>
       <a href="/contact/">Contact</a>
     </nav>
@@ -94,7 +95,6 @@
     <h1 class="tool-title">ZIP / Unzip Files</h1>
     <p class="tool-subtitle">Compress or extract files directly in your browser — nothing is uploaded anywhere</p>
 
-    <div class="ad-slot ad-slot-banner"></div>
 
     <div class="card">
       <div class="tool-tabs">
@@ -171,9 +171,15 @@
 
       <h2>Tips for Getting the Best Compression</h2>
       <p>To maximize compression: group similar file types together (similar files compress better relative to each other), compress text-heavy content (code, HTML, CSS, logs, CSVs), and avoid re-compressing already-compressed files (images, videos, existing ZIPs). For very large archives, consider 7-Zip's LZMA2 algorithm for significantly better ratios than DEFLATE, especially on repetitive data.</p>
+
+      <h2>Frequently asked questions</h2>
+      <p><strong>Are my files uploaded to a server?</strong> No. Zipping and unzipping happen entirely in your browser using JavaScript. Your files never leave your device, so it is safe to use with private documents.</p>
+      <p><strong>Is there a file size limit?</strong> There is no fixed limit, but because everything runs in memory in your browser, very large archives (multiple gigabytes) may be constrained by your device's available RAM. Desktop browsers handle large files far better than mobile.</p>
+      <p><strong>Why didn't my ZIP get much smaller?</strong> Files that are already compressed — JPEG and PNG images, MP4 videos, MP3 audio, PDFs, and existing ZIPs — have little redundancy left to remove, so they barely shrink. Text-based files compress the most.</p>
+      <p><strong>Can I password-protect a ZIP here?</strong> This tool creates standard ZIP archives without encryption. For password protection, use desktop software such as 7-Zip or the built-in tools in Windows and macOS.</p>
+      <p><strong>Will these ZIP files open on Windows and macOS?</strong> Yes. The archives use the standard ZIP format, which opens natively on Windows, macOS, Linux, iOS, and Android without extra software.</p>
     </div>
 
-    <div class="ad-slot ad-slot-bottom"></div>
   </div>
 </div>
 
@@ -185,7 +191,7 @@
     </div>
     <div class="footer-links">
       <h4>Tools</h4>
-      <a href="/mortgage/">Mortgage Calculator</a>
+      <a href="/">Mortgage Calculator</a>
       <a href="/bmi/">BMI Calculator</a>
       <a href="/world-clock/">World Clock</a>
       <a href="/json-formatter/">JSON Formatter</a>
@@ -194,6 +200,7 @@
     <div class="footer-links">
       <h4>Company</h4>
       <a href="/about/">About</a>
+      <a href="/guides/">Guides</a>
       <a href="/contact/">Contact</a>
     </div>
     <div class="footer-links">
@@ -355,6 +362,20 @@
     if (!window._zip || !window._zipFile) return;
     saveAs(window._zipFile, window._zipFile.name);
   }
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Are my files uploaded to a server?", "acceptedAnswer": { "@type": "Answer", "text": "No. Zipping and unzipping happen entirely in your browser using JavaScript. Your files never leave your device, so it is safe to use with private documents." } },
+    { "@type": "Question", "name": "Is there a file size limit for zipping?", "acceptedAnswer": { "@type": "Answer", "text": "There is no fixed limit, but because everything runs in memory in your browser, very large archives may be constrained by your device's available RAM. Desktop browsers handle large files far better than mobile." } },
+    { "@type": "Question", "name": "Why did my ZIP not get much smaller?", "acceptedAnswer": { "@type": "Answer", "text": "Files that are already compressed, such as JPEG and PNG images, MP4 videos, MP3 audio, PDFs, and existing ZIPs, have little redundancy left to remove. Text-based files compress the most." } },
+    { "@type": "Question", "name": "Can I password-protect a ZIP here?", "acceptedAnswer": { "@type": "Answer", "text": "This tool creates standard ZIP archives without encryption. For password protection, use desktop software such as 7-Zip or the built-in tools in Windows and macOS." } },
+    { "@type": "Question", "name": "Will these ZIP files open on Windows and macOS?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The archives use the standard ZIP format, which opens natively on Windows, macOS, Linux, iOS, and Android without extra software." } }
+  ]
+}
 </script>
 
 </body>
